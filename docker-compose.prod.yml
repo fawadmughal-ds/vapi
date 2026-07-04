@@ -1,0 +1,57 @@
+# Production compose — use with RDS PostgreSQL (no bundled db service).
+# Quick path: run on a single EC2 instance behind an ALB or nginx + TLS.
+#
+#   cp .env.example .env.production   # fill in production values
+#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+
+services:
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: ${DATABASE_URL}
+      BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS}
+      FRONTEND_URL: ${FRONTEND_URL}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-${FRONTEND_URL}}
+    volumes:
+      - backend_storage:/app/storage
+    command: >
+      sh -c "python -m app.seed &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2"
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-VoxaAI}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      BACKEND_INTERNAL_URL: http://backend:8000
+      NODE_ENV: production
+    ports:
+      - "${FRONTEND_HOST_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  backend_storage:

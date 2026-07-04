@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-voxa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-voxa_password}
+      POSTGRES_DB: ${POSTGRES_DB:-voxaai}
+    ports:
+      # Host port is configurable to avoid clashing with a local Postgres.
+      # Containers still reach the DB internally via "db:5432".
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-voxa} -d ${POSTGRES_DB:-voxaai}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-voxa}:${POSTGRES_PASSWORD:-voxa_password}@db:5432/${POSTGRES_DB:-voxaai}
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - backend_storage:/app/storage
+    command: >
+      sh -c "python -m app.seed &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-VoxaAI}
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source for hot reload; keep the container's own node_modules / .next.
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: sh -c "npm run dev"
+
+volumes:
+  pgdata:
+  backend_storage:
