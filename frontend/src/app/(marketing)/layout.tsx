@@ -17,11 +17,20 @@ export const metadata: Metadata = {
     description: seo.defaultDescription,
     type: "website",
     siteName: "NextCall",
+    images: [
+      {
+        url: "/nextcall-og.png",
+        width: 1200,
+        height: 630,
+        alt: "NextCall — AI Voice Agent Platform",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: seo.defaultTitle,
     description: seo.defaultDescription,
+    images: ["/nextcall-og.png"],
   },
 };
 

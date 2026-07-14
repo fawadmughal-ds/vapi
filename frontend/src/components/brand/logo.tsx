@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import { cn } from "@/lib/utils";
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "NextCall";
+const APP_NAME = "NextCall";
 
 export function Logo({
   className,
