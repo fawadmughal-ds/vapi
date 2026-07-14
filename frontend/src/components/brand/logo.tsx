@@ -13,7 +13,7 @@ export function Logo({
 }) {
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
-      <div className="relative flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-primary to-cyan-500 text-primary-foreground shadow-[0_0_20px_-4px_hsl(var(--glow-primary)/0.5)] ring-1 ring-white/10">
+      <div className="relative flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-cyan-400 to-violet-500 text-primary-foreground shadow-[0_0_28px_-4px_hsl(var(--glow-primary)/0.7)] ring-1 ring-white/20">
         <AudioLines className="size-[18px]" />
       </div>
       {showText && (
@@ -21,7 +21,7 @@ export function Logo({
           <span className="text-[15px] font-semibold tracking-tight">
             {APP_NAME}
           </span>
-          <span className="block text-[9px] font-medium uppercase tracking-[0.14em] text-muted-foreground/70">
+          <span className="block font-mono text-[9px] font-medium uppercase tracking-[0.16em] text-primary/65">
             Voice OS
           </span>
         </div>

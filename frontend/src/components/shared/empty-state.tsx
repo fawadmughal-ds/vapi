@@ -20,12 +20,12 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/10 text-center",
+        "flex flex-col items-center justify-center rounded-2xl border border-dashed border-primary/20 bg-muted/10 text-center shadow-[inset_0_1px_0_hsl(var(--foreground)/0.03)]",
         compact ? "py-10 px-6" : "py-16 px-8",
         className
       )}
     >
-      <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-cyan-500/5 ring-1 ring-primary/10">
+      <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-violet-500/10 ring-1 ring-primary/20 shadow-[0_0_28px_-12px_hsl(var(--primary)/0.75)]">
         <Icon className="size-6 text-primary/80" />
       </div>
       <h3 className="text-base font-semibold tracking-tight">{title}</h3>

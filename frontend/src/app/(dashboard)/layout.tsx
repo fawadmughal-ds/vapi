@@ -68,6 +68,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="saas-shell-bg flex h-screen overflow-hidden">
+      <div className="pointer-events-none fixed inset-0 -z-0 overflow-hidden">
+        <div className="absolute -left-48 -top-44 size-[34rem] rounded-full bg-primary/[0.07] blur-[120px] animate-aurora" />
+        <div className="absolute -right-44 top-1/3 size-[28rem] rounded-full bg-violet-500/[0.07] blur-[110px] animate-aurora" />
+      </div>
       <div className="hidden lg:block">
         <Sidebar />
       </div>
@@ -84,11 +88,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
         <ImpersonationBanner />
         <TopNav onMenu={() => setMobileOpen(true)} />
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-[1400px] space-y-8 px-4 py-6 lg:px-8 lg:py-8">
+          <div className="mx-auto max-w-[1400px] space-y-8 px-4 py-7 lg:px-8 lg:py-10">
             {children}
           </div>
         </main>

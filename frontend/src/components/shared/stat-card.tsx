@@ -24,11 +24,11 @@ export function StatCard({
     <div className="glass-card-hover metric-glow p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 space-y-2">
-          <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{label}</p>
           {loading ? (
             <Skeleton className="h-8 w-28" />
           ) : (
-            <p className="text-2xl font-semibold tracking-tight tabular-nums">
+            <p className="font-mono text-2xl font-semibold tracking-tight tabular-nums">
               {value}
             </p>
           )}
@@ -48,7 +48,7 @@ export function StatCard({
         </div>
         <div
           className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-muted/80 to-muted/30 ring-1 ring-border/50",
+            "flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 via-muted/70 to-violet-500/10 ring-1 ring-primary/15",
             accent
           )}
         >

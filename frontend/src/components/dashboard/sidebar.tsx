@@ -116,20 +116,21 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const isAdmin = user?.role === "super_admin";
 
   return (
-    <aside className="flex h-full w-[var(--sidebar-width)] flex-col border-r border-border/60 bg-card/30 backdrop-blur-xl">
-      <div className="flex h-14 shrink-0 items-center border-b border-border/50 px-4">
+    <aside className="relative flex h-full w-[var(--sidebar-width)] flex-col overflow-hidden border-r border-border/70 bg-card/45 shadow-[18px_0_70px_-50px_hsl(var(--glow-primary)/0.65)] backdrop-blur-2xl">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-primary/[0.09] via-violet-500/[0.035] to-transparent" />
+      <div className="relative flex h-16 shrink-0 items-center border-b border-border/60 px-4">
         <Link href={isAdmin ? "/admin" : "/dashboard"}>
           <Logo />
         </Link>
       </div>
 
       {!isAdmin && (
-        <div className="border-b border-border/50 p-3">
+        <div className="relative border-b border-border/50 p-3">
           <WorkspaceSwitcher compact />
         </div>
       )}
 
-      <Suspense fallback={<nav className="flex-1 px-2 py-3" />}>
+      <Suspense fallback={<nav className="relative flex-1 px-2 py-3" />}>
         <SidebarNav onNavigate={onNavigate} />
       </Suspense>
 
@@ -230,13 +231,13 @@ function SidebarFooter({ verified }: { verified: boolean }) {
   const { subscription: sub } = useSubscription();
 
   return (
-    <div className="shrink-0 border-t border-border/50 p-3">
+    <div className="relative shrink-0 border-t border-border/50 p-3">
       <SetupChecklistSidebar verified={verified} />
       {sub && (
-        <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+        <div className="rounded-xl border border-border/70 bg-muted/20 p-3 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.04)]">
           <div className="mb-2 flex items-center justify-between gap-2">
             <PlanBadge plan={sub.plan} status={sub.status} />
-            <span className="text-[10px] tabular-nums text-muted-foreground">
+            <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
               {formatNumber(Math.round(sub.credits_remaining))} cr left
             </span>
           </div>

@@ -17,14 +17,14 @@ export function PageHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("animate-slide-up", className)}>
+    <div className={cn("relative animate-slide-up", className)}>
       {breadcrumbs && breadcrumbs.length > 0 && (
         <Breadcrumbs items={breadcrumbs} />
       )}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-[1.65rem]">
+            <h1 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-[1.75rem]">
               {title}
             </h1>
             {badge}

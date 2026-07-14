@@ -29,12 +29,13 @@ export function MarketingNav() {
   return (
     <>
       {store.content.announcement && (
-        <div className="border-b border-primary/20 bg-primary/5 px-4 py-2 text-center text-xs text-primary">
+        <div className="border-b border-primary/20 bg-primary/[0.07] px-4 py-2 text-center font-mono text-[10px] uppercase tracking-[0.15em] text-primary">
+          <span className="mr-2 inline-block size-1.5 rounded-full bg-primary animate-pulse-signal" />
           {store.content.announcement}
         </div>
       )}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 lg:px-8">
+      <header className="sticky top-0 z-50 border-b border-border/70 bg-background/70 backdrop-blur-2xl">
+        <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-4 px-4 lg:px-8">
           <Link href="/">
             <Logo />
           </Link>
@@ -45,10 +46,10 @@ export function MarketingNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "relative rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   pathname === item.href || pathname.startsWith(item.href + "/")
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-primary/10 text-primary shadow-[0_0_20px_-12px_hsl(var(--primary)/0.8)]"
+                    : "text-muted-foreground hover:bg-primary/[0.05] hover:text-foreground"
                 )}
               >
                 {item.label}
@@ -78,14 +79,14 @@ export function MarketingNav() {
         </div>
 
         {open && (
-          <div className="border-t border-border/50 bg-background px-4 py-4 lg:hidden">
+          <div className="border-t border-border/50 bg-background/95 px-4 py-4 backdrop-blur-2xl lg:hidden">
             <nav className="flex flex-col gap-1">
               {NAV.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-accent"
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium hover:bg-primary/10"
                 >
                   {item.label}
                 </Link>

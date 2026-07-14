@@ -10,22 +10,22 @@ export default function AuthLayout({
 }) {
   return (
     <div className="saas-shell-bg grid min-h-screen lg:grid-cols-2">
-      <div className="flex flex-col px-6 py-8 lg:px-10">
+      <div className="relative flex flex-col px-6 py-8 lg:px-10">
         <Link href="/">
           <Logo />
         </Link>
         <div className="flex flex-1 items-center justify-center py-8">
-          <div className="w-full max-w-[400px] animate-slide-up">{children}</div>
+          <div className="glass-panel w-full max-w-[430px] rounded-3xl p-6 shadow-[0_28px_90px_-48px_hsl(var(--glow-primary)/0.65)] animate-slide-up sm:p-8">{children}</div>
         </div>
         <p className="text-center text-xs text-muted-foreground/60 lg:text-left">
           Enterprise-grade AI voice infrastructure · SOC 2 ready · Tenant isolated
         </p>
       </div>
       <div className="relative hidden overflow-hidden border-l border-border/50 lg:block">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-cyan-500/5" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--glow-cyan)/0.12),transparent_50%)]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-violet-500/10" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--glow-cyan)/0.18),transparent_50%)] animate-aurora" />
         <div className="relative flex h-full flex-col justify-center px-14 xl:px-20">
-          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
+          <p className="mb-6 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80">
             AI Voice Operating System
           </p>
           <h2 className="max-w-lg text-3xl font-semibold leading-tight tracking-tight xl:text-4xl">

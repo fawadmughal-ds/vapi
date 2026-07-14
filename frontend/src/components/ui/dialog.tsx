@@ -34,7 +34,7 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
       />
       <div
         className={cn(
-          "relative z-10 w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-2xl",
+          "glass-panel relative z-10 w-full max-w-lg rounded-2xl p-6 shadow-[0_30px_100px_-40px_hsl(var(--glow-primary)/0.55)]",
           className
         )}
       >

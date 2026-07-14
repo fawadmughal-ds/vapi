@@ -36,15 +36,16 @@ export default function HomePage() {
     <>
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border/40">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--glow-primary)/0.15),transparent_60%)]" />
-        <div className="relative mx-auto max-w-7xl px-4 py-20 lg:px-8 lg:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--glow-primary)/0.18),transparent_60%)]" />
+        <div className="absolute -right-24 top-0 size-[32rem] rounded-full bg-violet-500/[0.12] blur-[120px] animate-aurora" />
+        <div className="relative mx-auto max-w-7xl px-4 py-24 lg:px-8 lg:py-32">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="animate-slide-up">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-sm text-primary">
-                <Sparkles className="size-4" />
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/[0.08] px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-primary shadow-[0_0_24px_-12px_hsl(var(--primary)/0.9)]">
+                <Sparkles className="size-3.5" />
                 {hero.badge}
               </div>
-              <h1 className="text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.25rem]">
+              <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.7rem]">
                 {hero.headline}
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
@@ -66,7 +67,7 @@ export default function HomePage() {
                 {TRUST.map((t) => (
                   <span
                     key={t}
-                    className="rounded-md border border-border/60 bg-muted/20 px-2.5 py-1 text-[11px] font-medium text-muted-foreground"
+                    className="rounded-full border border-border/70 bg-card/35 px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground"
                   >
                     {t}
                   </span>
@@ -76,12 +77,12 @@ export default function HomePage() {
 
             {/* Product mockup */}
             <div className="relative hidden lg:block">
-              <div className="glass-panel overflow-hidden rounded-2xl border border-border/60 shadow-2xl">
+              <div className="glass-panel aurora-border overflow-hidden rounded-3xl shadow-[0_36px_100px_-48px_hsl(var(--glow-primary)/0.75)] animate-float">
                 <div className="flex items-center gap-2 border-b border-border/50 bg-muted/30 px-4 py-3">
                   <div className="size-2.5 rounded-full bg-red-400/80" />
                   <div className="size-2.5 rounded-full bg-amber-400/80" />
                   <div className="size-2.5 rounded-full bg-emerald-400/80" />
-                  <span className="ml-2 text-xs text-muted-foreground">
+                  <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
                     Workspace · Live calls
                   </span>
                 </div>
@@ -93,7 +94,7 @@ export default function HomePage() {
                   ].map((c) => (
                     <div
                       key={c.agent}
-                      className="flex items-center justify-between rounded-lg border border-border/50 bg-background/50 px-4 py-3"
+                      className="flex items-center justify-between rounded-xl border border-border/60 bg-background/50 px-4 py-3"
                     >
                       <div className="flex items-center gap-3">
                         <span
@@ -110,17 +111,17 @@ export default function HomePage() {
                           <p className="text-xs text-muted-foreground">{c.num}</p>
                         </div>
                       </div>
-                      <span className="text-xs capitalize text-muted-foreground">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
                         {c.status}
                       </span>
                     </div>
                   ))}
                   {/* Waveform visual */}
-                  <div className="flex h-12 items-end justify-center gap-1 rounded-lg bg-primary/5 px-4 py-2">
+                  <div className="flex h-12 items-end justify-center gap-1 rounded-xl border border-primary/15 bg-primary/[0.07] px-4 py-2">
                     {Array.from({ length: 32 }).map((_, i) => (
                       <div
                         key={i}
-                        className="w-1 rounded-full bg-primary/60"
+                        className="w-1 rounded-full bg-gradient-to-t from-primary/55 to-cyan-300"
                         style={{
                           height: `${18 + Math.abs(Math.sin(i * 0.55)) * 22}px`,
                         }}
@@ -135,11 +136,11 @@ export default function HomePage() {
       </section>
 
       {/* Metrics */}
-      <section className="border-b border-border/40 py-12">
+      <section className="border-b border-border/40 bg-card/[0.025] py-14">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 lg:grid-cols-4 lg:px-8">
           {METRICS.map((m) => (
             <div key={m.label} className="text-center">
-              <p className="text-2xl font-semibold tracking-tight text-gradient">
+              <p className="font-mono text-2xl font-semibold tracking-tight text-gradient">
                 {m.value}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">{m.label}</p>
@@ -152,7 +153,8 @@ export default function HomePage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight">
+            <p className="telemetry-label mb-3">One unified command surface</p>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
               Everything you need to run voice AI at scale
             </h2>
             <p className="mt-4 text-muted-foreground">
@@ -170,7 +172,7 @@ export default function HomePage() {
               { icon: Building2, title: "Multi-Tenant Workspaces", desc: "Isolated data, billing, and teams per workspace." },
             ].map((f) => (
               <div key={f.title} className="glass-card-hover p-6">
-                <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <div className="mb-4 flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-violet-500/10 text-primary ring-1 ring-primary/15">
                   <f.icon className="size-5" />
                 </div>
                 <h3 className="font-semibold">{f.title}</h3>
@@ -189,7 +191,7 @@ export default function HomePage() {
       </section>
 
       {/* How it works */}
-      <section className="border-y border-border/40 bg-muted/10 py-20">
+      <section className="border-y border-border/40 bg-muted/10 py-24">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <h2 className="text-center text-3xl font-semibold tracking-tight">
             Go live in four steps
@@ -202,7 +204,7 @@ export default function HomePage() {
               { step: "04", title: "Launch & optimize", desc: "Run campaigns, review analytics, iterate.", icon: Zap },
             ].map((s) => (
               <div key={s.step} className="relative glass-card p-6">
-                <span className="text-xs font-bold text-primary">{s.step}</span>
+                <span className="font-mono text-xs font-bold tracking-[0.12em] text-primary">{s.step}</span>
                 <s.icon className="mt-3 size-5 text-muted-foreground" />
                 <h3 className="mt-2 font-semibold">{s.title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{s.desc}</p>
@@ -275,8 +277,9 @@ export default function HomePage() {
 
       {/* Final CTA */}
       <section className="py-24">
-        <div className="mx-auto max-w-3xl px-4 text-center lg:px-8">
-          <h2 className="text-3xl font-semibold tracking-tight">
+        <div className="glass-panel aurora-border mx-auto max-w-4xl rounded-3xl px-6 py-14 text-center shadow-[0_36px_100px_-48px_hsl(var(--glow-primary)/0.7)] lg:px-12">
+          <p className="telemetry-label mb-4">Ready when you are</p>
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             Ready to deploy AI voice agents?
           </h2>
           <p className="mt-4 text-muted-foreground">
