@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     )
 
     # App
-    PROJECT_NAME: str = "VoxaAI"
+    PROJECT_NAME: str = "NextCall"
     API_V1_PREFIX: str = "/api/v1"
     ENVIRONMENT: str = "development"
     PUBLIC_BASE_URL: str = "http://localhost:8000"
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: Annotated[List[str], NoDecode] = ["http://localhost:3000"]
 
     # Super admin bootstrap
-    SUPERADMIN_EMAIL: str = "admin@voxaai.com"
+    SUPERADMIN_EMAIL: str = "admin@nextcall.ai"
     SUPERADMIN_PASSWORD: str = "ChangeMe123!"
     SUPERADMIN_NAME: str = "Platform Admin"
 
@@ -72,8 +72,8 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
-    EMAIL_FROM: str = "no-reply@voxaai.com"
-    EMAIL_FROM_NAME: str = "VoxaAI"
+    EMAIL_FROM: str = "no-reply@nextcall.ai"
+    EMAIL_FROM_NAME: str = "NextCall"
 
     # Storage
     STORAGE_BACKEND: str = "local"

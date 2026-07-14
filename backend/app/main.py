@@ -1,4 +1,4 @@
-"""VoxaAI FastAPI application entrypoint."""
+"""NextCall FastAPI application entrypoint."""
 
 from __future__ import annotations
 

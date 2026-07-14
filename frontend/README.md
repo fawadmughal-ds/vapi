@@ -1,4 +1,4 @@
-# VoxaAI Frontend (Next.js 15)
+# NextCall Frontend (Next.js 15)
 
 The customer + admin dashboard for the white-label voice platform. Built with the
 App Router, TypeScript, Tailwind CSS and shadcn-style UI components.

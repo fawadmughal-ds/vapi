@@ -68,7 +68,7 @@ export function MarketingFooter() {
           ))}
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border/50 pt-8 text-xs text-muted-foreground sm:flex-row">
-          <p>© {year} VoxaAI. All rights reserved.</p>
+          <p>© {year} NextCall. All rights reserved.</p>
           <div className="flex gap-6">
             <Link href="#" className="hover:text-foreground">
               Privacy

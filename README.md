@@ -1,4 +1,4 @@
-# VoxaAI — White-Label AI Voice Agent SaaS
+# NextCall — White-Label AI Voice Agent SaaS
 
 A production-ready, multi-tenant SaaS platform for building, deploying, and managing
 AI voice agents. Powered internally by [Vapi](https://vapi.ai), OpenAI, Deepgram,

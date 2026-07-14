@@ -9,14 +9,14 @@ const seo = DEFAULT_MARKETING_STORE.content.seo;
 export const metadata: Metadata = {
   title: {
     default: seo.defaultTitle,
-    template: "%s | VoxaAI",
+    template: "%s | NextCall",
   },
   description: seo.defaultDescription,
   openGraph: {
     title: seo.defaultTitle,
     description: seo.defaultDescription,
     type: "website",
-    siteName: "VoxaAI",
+    siteName: "NextCall",
   },
   twitter: {
     card: "summary_large_image",

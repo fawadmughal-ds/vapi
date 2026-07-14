@@ -1,4 +1,4 @@
-# VoxaAI Backend (FastAPI)
+# NextCall Backend (FastAPI)
 
 The control plane for the white-label voice platform. All Vapi communication is
 isolated in `app/services/vapi.py` — nothing else in the codebase (and certainly

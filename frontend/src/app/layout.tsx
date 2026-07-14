@@ -7,7 +7,7 @@ import "./globals.css";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "VoxaAI";
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "NextCall";
 
 export const metadata: Metadata = {
   title: {

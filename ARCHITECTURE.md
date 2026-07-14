@@ -1,4 +1,4 @@
-# VoxaAI — Architecture & System Overview
+# NextCall — Architecture & System Overview
 
 > A white-label, multi-tenant SaaS platform for building and running AI voice agents.
 > Internally powered by **Vapi** (voice infrastructure), **OpenAI** (LLM), **Deepgram**
@@ -10,7 +10,7 @@
 
 ## 1. What this software does
 
-VoxaAI lets a business (the **platform owner** / super admin) resell AI voice agents to
+NextCall lets a business (the **platform owner** / super admin) resell AI voice agents to
 their own customers (**tenants**). Each tenant can:
 
 - Create AI voice **agents** (prompt, voice, language, model, first message).

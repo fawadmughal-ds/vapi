@@ -392,11 +392,11 @@ export const DEFAULT_MARKETING_STORE: MarketingStore = {
       },
     ],
     seo: {
-      defaultTitle: "VoxaAI — AI Voice Agent Platform",
+      defaultTitle: "NextCall — AI Voice Agent Platform",
       defaultDescription:
         "Deploy AI phone agents for inbound and outbound calls. Multi-provider telephony, campaigns, analytics, and enterprise multi-tenant workspaces.",
     },
   },
 };
 
-export const STORAGE_KEY = "voxaai-marketing-store-v1";
+export const STORAGE_KEY = "nextcall-marketing-store-v1";

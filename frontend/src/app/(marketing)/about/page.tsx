@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export default function AboutPage() {
   return (
     <MarketingPageShell
-      title="About VoxaAI"
+      title="About NextCall"
       description="We're building the operating system for AI-powered voice communication — so every business can deploy intelligent phone agents at scale."
     >
       <div className="mx-auto max-w-3xl space-y-10 text-center">
