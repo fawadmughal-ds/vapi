@@ -2,15 +2,41 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import smtplib
+import socket
 import ssl
 from email.message import EmailMessage
 from html import escape as html_escape
 
+import httpx
+
 from app.core.config import settings
 
 logger = logging.getLogger("voxa.email")
+
+
+@contextlib.contextmanager
+def _force_ipv4():
+    """Temporarily force DNS resolution to IPv4 only.
+
+    Many container hosts (Render, Railway, Fly, etc.) have no IPv6 egress route.
+    When the SMTP host resolves to an AAAA record first, ``smtplib`` tries the
+    IPv6 address and fails with ``[Errno 101] Network is unreachable`` instead of
+    falling back to IPv4. Restricting getaddrinfo to ``AF_INET`` avoids this while
+    keeping the hostname intact for TLS/SNI verification.
+    """
+    original = socket.getaddrinfo
+
+    def ipv4_only(host, port, family=0, type=0, proto=0, flags=0):  # noqa: A002
+        return original(host, port, socket.AF_INET, type, proto, flags)
+
+    socket.getaddrinfo = ipv4_only
+    try:
+        yield
+    finally:
+        socket.getaddrinfo = original
 
 # ── Brand constants used to render professional, on-brand emails ──────────────
 BRAND_NAME = "NextCall"
@@ -23,13 +49,21 @@ CURRENT_YEAR = "2026"
 
 class EmailService:
     @property
-    def enabled(self) -> bool:
+    def _resend_enabled(self) -> bool:
+        return bool((settings.RESEND_API_KEY or "").strip())
+
+    @property
+    def _smtp_enabled(self) -> bool:
         host = (settings.SMTP_HOST or "").strip().lower()
         # Treat empty or obvious placeholder hosts as "not configured" so local
         # dev doesn't attempt (and fail) real SMTP connections.
         if not host or not settings.SMTP_USER or "example.com" in host:
             return False
         return True
+
+    @property
+    def enabled(self) -> bool:
+        return self._resend_enabled or self._smtp_enabled
 
     def send(
         self,
@@ -43,27 +77,77 @@ class EmailService:
     ) -> bool:
         """Send an email. Returns True on success.
 
-        Supports both implicit SSL (port 465) and STARTTLS (port 587) so it works
-        with Hostinger/Gmail/etc regardless of the configured port. Errors are
-        logged; set ``raise_on_error`` to propagate them (used by the contact
-        form so the user gets real feedback).
+        Prefers the Resend HTTPS API when ``RESEND_API_KEY`` is set (works on
+        hosts that block SMTP ports, e.g. Render's free tier). Otherwise falls
+        back to SMTP, supporting both implicit SSL (465) and STARTTLS (587).
+        Errors are logged; set ``raise_on_error`` to propagate them (used by the
+        contact form so the user gets real feedback).
         """
         if not self.enabled:
             logger.info("[EMAIL:dev] to=%s subject=%s\n%s", to, subject, text or html)
             return True
-        # Use the authenticated mailbox as the From when EMAIL_FROM is unset so a
-        # domain mismatch doesn't get the message rejected by the provider.
+
         from_addr = (settings.EMAIL_FROM or "").strip() or settings.SMTP_USER
+        from_header = f"{settings.EMAIL_FROM_NAME} <{from_addr}>"
+        try:
+            if self._resend_enabled:
+                self._send_via_resend(
+                    from_header=from_header, to=to, subject=subject,
+                    html=html, text=text, reply_to=reply_to,
+                )
+            else:
+                self._send_via_smtp(
+                    from_header=from_header, to=to, subject=subject,
+                    html=html, text=text, reply_to=reply_to,
+                )
+            logger.info("Email sent to %s (subject=%s)", to, subject)
+            return True
+        except Exception as exc:  # noqa: BLE001
+            logger.error("Failed to send email to %s (subject=%s): %s", to, subject, exc)
+            if raise_on_error:
+                raise
+            return False
+
+    def _send_via_resend(
+        self, *, from_header: str, to: str, subject: str,
+        html: str, text: str | None, reply_to: str | None,
+    ) -> None:
+        payload: dict = {
+            "from": from_header,
+            "to": [to],
+            "subject": subject,
+            "html": html,
+        }
+        if text:
+            payload["text"] = text
+        if reply_to:
+            payload["reply_to"] = reply_to
+        resp = httpx.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+            timeout=30,
+        )
+        if resp.status_code >= 400:
+            raise RuntimeError(f"Resend API error {resp.status_code}: {resp.text}")
+
+    def _send_via_smtp(
+        self, *, from_header: str, to: str, subject: str,
+        html: str, text: str | None, reply_to: str | None,
+    ) -> None:
         msg = EmailMessage()
-        msg["From"] = f"{settings.EMAIL_FROM_NAME} <{from_addr}>"
+        msg["From"] = from_header
         msg["To"] = to
         msg["Subject"] = subject
         if reply_to:
             msg["Reply-To"] = reply_to
         msg.set_content(text or "Please view this email in an HTML client.")
         msg.add_alternative(html, subtype="html")
-        try:
-            port = int(settings.SMTP_PORT or 587)
+        port = int(settings.SMTP_PORT or 587)
+        with _force_ipv4():
             if port == 465:
                 context = ssl.create_default_context()
                 with smtplib.SMTP_SSL(settings.SMTP_HOST, port, context=context, timeout=30) as server:
@@ -75,13 +159,6 @@ class EmailService:
                     server.starttls(context=ssl.create_default_context())
                     server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
                     server.send_message(msg)
-            logger.info("Email sent to %s (subject=%s)", to, subject)
-            return True
-        except Exception as exc:  # noqa: BLE001
-            logger.error("Failed to send email to %s (subject=%s): %s", to, subject, exc)
-            if raise_on_error:
-                raise
-            return False
 
     def send_verification(self, *, to: str, name: str, link: str) -> None:
         self.send(

@@ -68,6 +68,10 @@ class Settings(BaseSettings):
     STRIPE_PRICE_PRO: str = ""
 
     # Email
+    # If RESEND_API_KEY is set, email is sent via the Resend HTTPS API (works on
+    # any host, including Render's free tier which blocks SMTP ports). Otherwise
+    # falls back to SMTP using the settings below.
+    RESEND_API_KEY: str = ""
     SMTP_HOST: str = ""
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
