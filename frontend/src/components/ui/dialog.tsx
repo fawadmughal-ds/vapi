@@ -33,14 +33,17 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
         onClick={onClose}
       />
       <div
+        role="dialog"
+        aria-modal="true"
         className={cn(
-          "glass-panel relative z-10 w-full max-w-lg rounded-2xl p-6 shadow-[0_30px_100px_-40px_hsl(var(--glow-primary)/0.55)]",
+          "glass-panel animate-scale-in relative z-10 w-full max-w-lg rounded-2xl p-6 shadow-[0_30px_100px_-40px_hsl(var(--glow-primary)/0.55)]",
           className
         )}
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-muted-foreground hover:text-foreground"
+          aria-label="Close"
+          className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
         >
           <X className="size-4" />
         </button>

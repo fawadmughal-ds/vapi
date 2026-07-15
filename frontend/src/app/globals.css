@@ -184,6 +184,42 @@
   .telemetry-label {
     @apply font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-primary/80;
   }
+
+  /* Interactive surface that lifts and reveals a soft aurora glow on hover. */
+  .interactive-surface {
+    @apply relative overflow-hidden transition-all duration-300 ease-out will-change-transform;
+  }
+  .interactive-surface:hover {
+    @apply -translate-y-0.5;
+  }
+
+  /* Diagonal light sweep for premium cards/buttons on hover. */
+  .card-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .card-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      115deg,
+      transparent 30%,
+      hsl(var(--foreground) / 0.09) 46%,
+      transparent 62%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .card-shine:hover::after {
+    transform: translateX(120%);
+  }
+
+  /* Focus ring used for accessible, on-brand keyboard focus. */
+  .focus-ring {
+    @apply outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring/70;
+  }
 }
 
 @layer utilities {
@@ -202,6 +238,28 @@
   .animate-pulse-signal {
     animation: signal-pulse 2s ease-in-out infinite;
   }
+  .animate-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+  .animate-scale-in {
+    animation: scale-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Reveal-on-enter helpers. Add .reveal to a container; direct children
+     fade/slide in with a gentle stagger. Respects reduced-motion below. */
+  .reveal > * {
+    opacity: 0;
+    animation: reveal-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .reveal > *:nth-child(1) { animation-delay: 0.04s; }
+  .reveal > *:nth-child(2) { animation-delay: 0.1s; }
+  .reveal > *:nth-child(3) { animation-delay: 0.16s; }
+  .reveal > *:nth-child(4) { animation-delay: 0.22s; }
+  .reveal > *:nth-child(5) { animation-delay: 0.28s; }
+  .reveal > *:nth-child(6) { animation-delay: 0.34s; }
+  .reveal > *:nth-child(7) { animation-delay: 0.4s; }
+  .reveal > *:nth-child(8) { animation-delay: 0.46s; }
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -231,6 +289,18 @@
   @keyframes signal-pulse {
     0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.38); }
     50% { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes reveal-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   .glow {
     box-shadow: 0 0 32px -8px hsl(var(--glow-primary) / 0.45);

@@ -55,24 +55,26 @@ export default function AgentsPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="reveal grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {agents.map((agent) => (
-            <Link key={agent.id} href={`/agents/${agent.id}`}>
-              <Card className="transition-colors hover:border-primary/50">
+            <Link key={agent.id} href={`/agents/${agent.id}`} className="group">
+              <Card className="card-shine h-full transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_24px_64px_-34px_hsl(var(--glow-primary)/0.55)]">
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-violet-500/10 text-primary ring-1 ring-primary/15 transition-transform duration-300 group-hover:scale-105">
                       <Bot className="size-5" />
                     </div>
-                    <MoreVertical className="size-4 text-muted-foreground" />
+                    <MoreVertical className="size-4 text-muted-foreground/60 transition-colors group-hover:text-foreground" />
                   </div>
-                  <h3 className="mt-4 font-semibold">{agent.name}</h3>
+                  <h3 className="mt-4 font-semibold transition-colors group-hover:text-primary">
+                    {agent.name}
+                  </h3>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                     {agent.description || "No description"}
                   </p>
-                  <div className="mt-4 flex items-center justify-between">
+                  <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-3">
                     <StatusBadge status={agent.status} />
-                    <span className="text-xs text-muted-foreground">
+                    <span className="font-mono text-[11px] text-muted-foreground">
                       {formatDate(agent.created_at)}
                     </span>
                   </div>

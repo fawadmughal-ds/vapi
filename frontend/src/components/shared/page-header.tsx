@@ -24,6 +24,10 @@ export function PageHeader({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2.5">
+            <span
+              aria-hidden
+              className="hidden h-7 w-1 rounded-full bg-gradient-to-b from-primary via-primary/60 to-violet-400/50 shadow-[0_0_12px_hsl(var(--primary)/0.6)] sm:block"
+            />
             <h1 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-[1.75rem]">
               {title}
             </h1>

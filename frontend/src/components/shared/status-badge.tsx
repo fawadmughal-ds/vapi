@@ -1,4 +1,5 @@
 import { Badge, type BadgeProps } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const MAP: Record<string, BadgeProps["variant"]> = {
   // calls
@@ -34,8 +35,29 @@ const MAP: Record<string, BadgeProps["variant"]> = {
   uploading: "secondary",
 };
 
+const DOT: Record<NonNullable<BadgeProps["variant"]>, string> = {
+  default: "bg-primary",
+  secondary: "bg-muted-foreground/50",
+  success: "bg-emerald-400",
+  warning: "bg-amber-400",
+  destructive: "bg-destructive",
+  outline: "bg-muted-foreground/50",
+};
+
 export function StatusBadge({ status }: { status: string }) {
   const variant = MAP[status] ?? "secondary";
   const label = status.replace(/_/g, " ");
-  return <Badge variant={variant} className="capitalize">{label}</Badge>;
+  const live = status === "in_progress" || status === "ringing";
+  return (
+    <Badge variant={variant} className="gap-1.5 capitalize">
+      <span
+        className={cn(
+          "size-1.5 rounded-full",
+          DOT[variant ?? "secondary"],
+          live && "animate-pulse"
+        )}
+      />
+      {label}
+    </Badge>
+  );
 }

@@ -86,7 +86,7 @@ export default function DashboardPage() {
         <SetupChecklist verified={user?.is_email_verified ?? false} />
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="reveal grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Total calls"
           value={formatNumber(s?.total_calls)}
@@ -248,16 +248,18 @@ export default function DashboardPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="flex items-center gap-3 rounded-lg border border-border/50 bg-muted/10 px-3 py-2.5 transition-all hover:border-border hover:bg-accent/30"
+                  className="group/step flex items-center gap-3 rounded-lg border border-border/50 bg-muted/10 px-3 py-2.5 transition-all hover:-translate-y-px hover:border-primary/30 hover:bg-accent/30"
                 >
-                  <item.icon className="size-4 shrink-0 text-primary/80" />
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/15 transition-colors group-hover/step:bg-primary/15">
+                    <item.icon className="size-4 text-primary/90" />
+                  </span>
                   <span className="flex-1 text-sm font-medium">{item.label}</span>
                   {item.done ? (
-                    <span className="text-[10px] font-medium text-emerald-400">
+                    <span className="font-mono text-[10px] font-medium uppercase tracking-wider text-emerald-400">
                       Done
                     </span>
                   ) : (
-                    <ArrowRight className="size-3.5 text-muted-foreground" />
+                    <ArrowRight className="size-3.5 text-muted-foreground transition-transform group-hover/step:translate-x-0.5" />
                   )}
                 </Link>
               ))}
@@ -278,18 +280,21 @@ export default function DashboardPage() {
                   Agent metrics appear after your first calls.
                 </p>
               ) : (
-                analytics.agent_performance.slice(0, 5).map((a) => (
+                analytics.agent_performance.slice(0, 5).map((a, i) => (
                   <div
                     key={a.agent_id}
-                    className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/10 px-3 py-2"
+                    className="flex items-center gap-3 rounded-lg border border-border/40 bg-muted/10 px-3 py-2 transition-all hover:border-primary/25 hover:bg-muted/20"
                   >
-                    <div className="min-w-0">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/10 font-mono text-[11px] font-semibold text-primary ring-1 ring-primary/15">
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">{a.agent_name}</p>
                       <p className="text-xs text-muted-foreground">
                         {a.calls} calls · avg {formatDuration(a.avg_duration_seconds)}
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm font-semibold tabular-nums text-emerald-400">
+                    <span className="shrink-0 font-mono text-sm font-semibold tabular-nums text-emerald-400">
                       {a.success_rate}%
                     </span>
                   </div>

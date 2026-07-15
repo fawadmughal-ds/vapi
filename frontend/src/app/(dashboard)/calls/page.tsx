@@ -69,9 +69,9 @@ export default function CallsPage() {
         description="Browse, search, and review every call your agents handled."
       />
 
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="glass-card flex flex-col gap-3 p-3 sm:flex-row sm:items-center">
+        <div className="group relative flex-1">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
           <Input
             placeholder="Search number or transcript..."
             className="pl-9"
@@ -171,7 +171,9 @@ export default function CallsPage() {
       {data && data.pages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Page {data.page} of {data.pages} · {data.total} calls
+            Page <span className="font-mono text-foreground">{data.page}</span> of{" "}
+            <span className="font-mono text-foreground">{data.pages}</span> ·{" "}
+            <span className="font-mono text-foreground">{data.total}</span> calls
           </p>
           <div className="flex gap-2">
             <Button
@@ -243,9 +245,11 @@ export default function CallsPage() {
 
 function Detail({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-border p-2.5">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-0.5 font-medium capitalize">{value}</p>
+    <div className="rounded-lg border border-border/60 bg-muted/20 p-2.5">
+      <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 font-medium capitalize">{value}</p>
     </div>
   );
 }
