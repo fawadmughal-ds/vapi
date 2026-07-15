@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Building2, PhoneCall, Shield, Zap } from "lucide-react";
 
 import { Logo } from "@/components/brand/logo";
+
+export const metadata: Metadata = {
+  title: "Sign in",
+  description: "Access your NextCall workspace to manage AI voice agents, phone numbers, campaigns, and call analytics.",
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default function AuthLayout({
   children,
