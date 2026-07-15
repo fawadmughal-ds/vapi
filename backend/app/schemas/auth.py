@@ -43,6 +43,15 @@ class VerifyEmailRequest(BaseModel):
     token: str
 
 
+class VerifyOtpRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(min_length=4, max_length=10)
+
+
+class ResendOtpRequest(BaseModel):
+    email: EmailStr
+
+
 class UserPublic(ORMBase):
     id: str
     name: str

@@ -47,8 +47,8 @@ function RegisterForm() {
     setLoading(true);
     try {
       await register(form);
-      toast.success("Workspace created! Check your email to verify.");
-      router.push("/dashboard");
+      toast.success("Workspace created! We sent a 6-digit code to your email.");
+      router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Registration failed");
     } finally {

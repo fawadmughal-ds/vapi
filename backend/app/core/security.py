@@ -1,5 +1,7 @@
 """Password hashing and JWT token utilities."""
 
+import hashlib
+import hmac
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
@@ -68,3 +70,22 @@ def decode_token(token: str) -> Optional[dict]:
 def generate_url_safe_token(length: int = 48) -> str:
     """Used for email verification and password reset tokens."""
     return secrets.token_urlsafe(length)
+
+
+def generate_otp(length: int = 6) -> str:
+    """Cryptographically-random numeric one-time password (zero-padded)."""
+    return "".join(secrets.choice("0123456789") for _ in range(length))
+
+
+def hash_otp(user_id: str, code: str) -> str:
+    """Deterministic, per-user hash of an OTP so we never store the raw code.
+
+    Bound to the user id and the app secret so codes are unique per user and
+    cannot be precomputed. Fits the existing ``email_tokens.token`` column.
+    """
+    message = f"{user_id}:{code}".encode()
+    return hmac.new(settings.SECRET_KEY.encode(), message, hashlib.sha256).hexdigest()
+
+
+def verify_otp(user_id: str, code: str, hashed: str) -> bool:
+    return hmac.compare_digest(hash_otp(user_id, code), hashed)

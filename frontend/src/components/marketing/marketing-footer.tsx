@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Mail } from "lucide-react";
 
 import { Logo } from "@/components/brand/logo";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,13 @@ export function MarketingFooter() {
               The multi-tenant AI voice platform for inbound and outbound calling
               at enterprise scale.
             </p>
+            <a
+              href="mailto:info@nextcall.online"
+              className="mt-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Mail className="size-4 text-primary/80" />
+              info@nextcall.online
+            </a>
             <div className="mt-6 flex gap-2">
               <Input placeholder="Work email" className="h-9 max-w-[200px] text-sm" />
               <Button size="sm">Subscribe</Button>

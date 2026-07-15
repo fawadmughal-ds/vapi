@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 import { MarketingPageShell } from "@/components/marketing/page-shell";
@@ -47,6 +47,19 @@ export default function ContactPage() {
       title="Contact & book a demo"
       description="Tell us about your use case. We'll help you evaluate the platform and plan your deployment."
     >
+      <div className="mx-auto mb-8 flex max-w-2xl flex-col items-center gap-2 text-center">
+        <p className="text-sm text-muted-foreground">
+          Prefer email? Reach us directly at
+        </p>
+        <a
+          href="mailto:info@nextcall.online"
+          className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/[0.08] px-4 py-1.5 text-sm font-medium text-primary shadow-[0_0_24px_-12px_hsl(var(--primary)/0.9)] transition-colors hover:bg-primary/[0.14]"
+        >
+          <Mail className="size-4" />
+          info@nextcall.online
+        </a>
+      </div>
+
       <form
         onSubmit={onSubmit}
         className="mx-auto grid max-w-2xl gap-5 sm:grid-cols-2"

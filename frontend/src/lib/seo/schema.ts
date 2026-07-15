@@ -39,18 +39,19 @@ export function organizationSchema() {
       "AI call centers",
       "SIP calling",
     ],
+    email: "info@nextcall.online",
     contactPoint: [
       {
         "@type": "ContactPoint",
         contactType: "sales",
-        email: "sales@nextcall.online",
+        email: "info@nextcall.online",
         url: abs("/contact"),
         availableLanguage: ["English"],
       },
       {
         "@type": "ContactPoint",
         contactType: "customer support",
-        email: "support@nextcall.online",
+        email: "info@nextcall.online",
         url: abs("/contact"),
         availableLanguage: ["English"],
       },

@@ -15,8 +15,11 @@ from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
+    generate_otp,
     generate_url_safe_token,
+    hash_otp,
     hash_password,
+    verify_otp,
     verify_password,
 )
 from app.models.enums import UserRole
@@ -28,10 +31,12 @@ from app.schemas.auth import (
     LoginRequest,
     RefreshRequest,
     RegisterRequest,
+    ResendOtpRequest,
     ResetPasswordRequest,
     TokenPair,
     UserPublic,
     VerifyEmailRequest,
+    VerifyOtpRequest,
 )
 from app.schemas.common import Message
 from app.services.audit import record_audit
@@ -62,6 +67,32 @@ def _create_email_token(db: Session, user: User, purpose: str, hours: int) -> st
     return token
 
 
+# OTP codes are short-lived and stored hashed (bound to the user) in the same
+# email_tokens table, so no schema migration is required.
+OTP_PURPOSE = "verify_otp"
+OTP_TTL_MINUTES = 15
+
+
+def _create_verification_otp(db: Session, user: User) -> str:
+    """Invalidate any prior codes and issue a fresh 6-digit OTP for the user."""
+    db.query(EmailToken).filter(
+        EmailToken.user_id == user.id,
+        EmailToken.purpose == OTP_PURPOSE,
+        EmailToken.used == False,  # noqa: E712
+    ).update({EmailToken.used: True})
+    code = generate_otp(6)
+    db.add(
+        EmailToken(
+            user_id=user.id,
+            token=hash_otp(user.id, code),
+            purpose=OTP_PURPOSE,
+            expires_at=datetime.now(timezone.utc) + timedelta(minutes=OTP_TTL_MINUTES),
+        )
+    )
+    db.commit()
+    return code
+
+
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
 def register(request: Request, payload: RegisterRequest, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == payload.email.lower()).first()
@@ -81,9 +112,8 @@ def register(request: Request, payload: RegisterRequest, db: Session = Depends(g
 
     ensure_subscription(db, user.id)
 
-    token = _create_email_token(db, user, "verify", hours=48)
-    link = f"{settings.FRONTEND_URL}/verify-email?token={token}"
-    email_service.send_verification(to=user.email, name=user.name, link=link)
+    code = _create_verification_otp(db, user)
+    email_service.send_verification_otp(to=user.email, name=user.name, code=code)
 
     record_audit(db, user_id=user.id, action="user.register", resource_type="user",
                  resource_id=user.id, ip_address=request.client.host if request.client else None)
@@ -137,15 +167,59 @@ def verify_email(payload: VerifyEmailRequest, db: Session = Depends(get_db)):
     return Message(detail="Email verified successfully")
 
 
+@router.post("/verify-otp", response_model=Message)
+def verify_otp_code(payload: VerifyOtpRequest, db: Session = Depends(get_db)):
+    """Verify a new user's email using the 6-digit code sent on registration."""
+    user = db.query(User).filter(User.email == payload.email.lower()).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid or expired code")
+    if user.is_email_verified:
+        return Message(detail="Email already verified")
+
+    code = payload.code.strip()
+    token = (
+        db.query(EmailToken)
+        .filter(
+            EmailToken.user_id == user.id,
+            EmailToken.purpose == OTP_PURPOSE,
+            EmailToken.used == False,  # noqa: E712
+            EmailToken.token == hash_otp(user.id, code),
+        )
+        .first()
+    )
+    if (
+        not token
+        or not verify_otp(user.id, code, token.token)
+        or token.expires_at < datetime.now(timezone.utc)
+    ):
+        raise HTTPException(status_code=400, detail="Invalid or expired code")
+
+    user.is_email_verified = True
+    token.used = True
+    db.commit()
+    record_audit(db, user_id=user.id, action="user.verify_email", resource_type="user",
+                 resource_id=user.id)
+    return Message(detail="Email verified successfully")
+
+
+@router.post("/resend-otp", response_model=Message)
+def resend_otp(payload: ResendOtpRequest, db: Session = Depends(get_db)):
+    """Re-send a verification code. Generic response to avoid user enumeration."""
+    user = db.query(User).filter(User.email == payload.email.lower()).first()
+    if user and not user.is_email_verified:
+        code = _create_verification_otp(db, user)
+        email_service.send_verification_otp(to=user.email, name=user.name, code=code)
+    return Message(detail="If that account needs verification, a new code has been sent")
+
+
 @router.post("/resend-verification", response_model=Message)
 def resend_verification(user: User = Depends(get_current_user),
                         db: Session = Depends(get_db)):
     if user.is_email_verified:
         return Message(detail="Email already verified")
-    token = _create_email_token(db, user, "verify", hours=48)
-    link = f"{settings.FRONTEND_URL}/verify-email?token={token}"
-    email_service.send_verification(to=user.email, name=user.name, link=link)
-    return Message(detail="Verification email sent")
+    code = _create_verification_otp(db, user)
+    email_service.send_verification_otp(to=user.email, name=user.name, code=code)
+    return Message(detail="Verification code sent")
 
 
 @router.post("/forgot-password", response_model=Message)
