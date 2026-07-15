@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import logging
 import smtplib
+import ssl
 from email.message import EmailMessage
+from html import escape as html_escape
 
 from app.core.config import settings
 
@@ -29,23 +31,57 @@ class EmailService:
             return False
         return True
 
-    def send(self, *, to: str, subject: str, html: str, text: str | None = None) -> None:
+    def send(
+        self,
+        *,
+        to: str,
+        subject: str,
+        html: str,
+        text: str | None = None,
+        reply_to: str | None = None,
+        raise_on_error: bool = False,
+    ) -> bool:
+        """Send an email. Returns True on success.
+
+        Supports both implicit SSL (port 465) and STARTTLS (port 587) so it works
+        with Hostinger/Gmail/etc regardless of the configured port. Errors are
+        logged; set ``raise_on_error`` to propagate them (used by the contact
+        form so the user gets real feedback).
+        """
         if not self.enabled:
             logger.info("[EMAIL:dev] to=%s subject=%s\n%s", to, subject, text or html)
-            return
+            return True
+        # Use the authenticated mailbox as the From when EMAIL_FROM is unset so a
+        # domain mismatch doesn't get the message rejected by the provider.
+        from_addr = (settings.EMAIL_FROM or "").strip() or settings.SMTP_USER
         msg = EmailMessage()
-        msg["From"] = f"{settings.EMAIL_FROM_NAME} <{settings.EMAIL_FROM}>"
+        msg["From"] = f"{settings.EMAIL_FROM_NAME} <{from_addr}>"
         msg["To"] = to
         msg["Subject"] = subject
+        if reply_to:
+            msg["Reply-To"] = reply_to
         msg.set_content(text or "Please view this email in an HTML client.")
         msg.add_alternative(html, subtype="html")
         try:
-            with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-                server.starttls()
-                server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-                server.send_message(msg)
+            port = int(settings.SMTP_PORT or 587)
+            if port == 465:
+                context = ssl.create_default_context()
+                with smtplib.SMTP_SSL(settings.SMTP_HOST, port, context=context, timeout=30) as server:
+                    server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+                    server.send_message(msg)
+            else:
+                with smtplib.SMTP(settings.SMTP_HOST, port, timeout=30) as server:
+                    server.ehlo()
+                    server.starttls(context=ssl.create_default_context())
+                    server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+                    server.send_message(msg)
+            logger.info("Email sent to %s (subject=%s)", to, subject)
+            return True
         except Exception as exc:  # noqa: BLE001
-            logger.warning("Failed to send email to %s: %s", to, exc)
+            logger.error("Failed to send email to %s (subject=%s): %s", to, subject, exc)
+            if raise_on_error:
+                raise
+            return False
 
     def send_verification(self, *, to: str, name: str, link: str) -> None:
         self.send(
@@ -237,6 +273,68 @@ class EmailService:
                 "workspace."
                 + (f"\nNew balance: {new_balance}" if new_balance else "")
                 + f"\n\nDashboard: {dashboard}"
+            ),
+        )
+
+    def send_contact_inquiry(
+        self,
+        *,
+        name: str,
+        email: str,
+        message: str,
+        details: list[tuple[str, str]] | None = None,
+    ) -> bool:
+        """Deliver a contact-form submission to the support inbox.
+
+        Raises on SMTP failure so the API can report it to the user. Reply-To is
+        set to the sender so support can reply directly.
+        """
+        rows = list(details or [])
+        rows = [("Name", name), ("Email", email), *rows]
+        safe_message = html_escape(message).replace("\n", "<br>")
+        return self.send(
+            to=SUPPORT_EMAIL,
+            reply_to=email,
+            raise_on_error=True,
+            subject=f"New inquiry from {name} — {BRAND_NAME}",
+            html=_template(
+                preheader=f"New contact inquiry from {name} ({email}).",
+                title="New contact inquiry",
+                body=(
+                    "A new message was submitted through the NextCall contact form."
+                    "<br><br><strong>Message:</strong><br>"
+                    f"{safe_message}"
+                ),
+                details=rows,
+                footnote=f"Reply directly to this email to reach {name}.",
+            ),
+            text=(
+                f"New contact inquiry\n\nName: {name}\nEmail: {email}\n"
+                + "".join(f"{k}: {v}\n" for k, v in (details or []))
+                + f"\nMessage:\n{message}\n"
+            ),
+        )
+
+    def send_contact_ack(self, *, to: str, name: str) -> None:
+        """Auto-acknowledgement to the person who submitted the contact form."""
+        self.send(
+            to=to,
+            subject=f"We received your message — {BRAND_NAME}",
+            html=_template(
+                preheader="Thanks for contacting NextCall — we'll be in touch soon.",
+                title="Thanks for reaching out",
+                body=(
+                    f"Hi {name}, thanks for contacting {BRAND_NAME}. We've received your "
+                    "message and a member of our team will get back to you within one "
+                    "business day. If it's urgent, just reply to this email."
+                ),
+                cta_text="Explore the platform",
+                cta_link=SITE_URL,
+                footnote=f"You can always reach us at {SUPPORT_EMAIL}.",
+            ),
+            text=(
+                f"Hi {name}, thanks for contacting {BRAND_NAME}. We'll get back to you "
+                f"within one business day. Reach us anytime at {SUPPORT_EMAIL}."
             ),
         )
 

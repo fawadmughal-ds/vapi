@@ -197,6 +197,7 @@ def verify_otp_code(payload: VerifyOtpRequest, db: Session = Depends(get_db)):
     user.is_email_verified = True
     token.used = True
     db.commit()
+    email_service.send_welcome(to=user.email, name=user.name)
     record_audit(db, user_id=user.id, action="user.verify_email", resource_type="user",
                  resource_id=user.id)
     return Message(detail="Email verified successfully")

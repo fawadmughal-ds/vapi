@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/ui/spinner";
+import { api, ApiError } from "@/lib/api";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -18,11 +19,32 @@ export default function ContactPage() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const payload = {
+      name: String(form.get("name") || "").trim(),
+      email: String(form.get("email") || "").trim(),
+      message: String(form.get("usecase") || "").trim(),
+      company: String(form.get("company") || "").trim() || undefined,
+      inquiry_type: String(form.get("type") || "").trim() || undefined,
+      company_size: String(form.get("size") || "").trim() || undefined,
+      call_volume: String(form.get("volume") || "").trim() || undefined,
+      provider: String(form.get("provider") || "").trim() || undefined,
+    };
+
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
-    setSubmitted(true);
-    toast.success("Message received — we'll be in touch within 1 business day.");
+    try {
+      await api.post("/contact", payload, { auth: false });
+      setSubmitted(true);
+      toast.success("Message received — we'll be in touch within 1 business day.");
+    } catch (err) {
+      const msg =
+        err instanceof ApiError
+          ? err.message
+          : "Something went wrong. Please email info@nextcall.online directly.";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (submitted) {

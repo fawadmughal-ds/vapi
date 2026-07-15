@@ -60,6 +60,7 @@ from app.schemas.tool import ToolPublic
 from app.services.analytics import aggregate_analytics
 from app.services.audit import record_audit
 from app.services.billing import activate_plan, ensure_subscription
+from app.services.email import email_service
 from app.services.credits import (
     adjust_tenant_credits,
     get_platform_settings,
@@ -718,6 +719,13 @@ def update_tenant_credits(
     if payload.add_topup:
         adjust_tenant_credits(db, sub, payload.add_topup)
     db.refresh(sub)
+    if payload.add_topup:
+        email_service.send_credits_added(
+            to=user.email,
+            name=user.name,
+            credits=f"{payload.add_topup:g}",
+            new_balance=f"{sub.credits_remaining:g}",
+        )
     record_audit(db, user_id=admin.id, action="admin.tenant.credits",
                  resource_type="subscription", resource_id=user_id,
                  detail=payload.model_dump(exclude_none=True))

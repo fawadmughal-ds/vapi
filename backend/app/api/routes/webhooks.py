@@ -20,6 +20,7 @@ from app.models.call import Call
 from app.models.enums import CallDirection, CallStatus, PlanTier
 from app.models.user import User
 from app.services.billing import activate_plan, record_usage
+from app.services.email import email_service
 from app.services.functions import execute_function
 from app.services.plans import plan_for_stripe_price
 from app.services.stripe_service import (
@@ -264,6 +265,20 @@ async def stripe_webhook(
             activate_plan(
                 db, user.id, plan,
                 stripe_subscription_id=subscription_id, stripe_price_id=price_id,
+            )
+            amount_total = data.get("amount_total")
+            currency = (data.get("currency") or "usd").upper()
+            if amount_total is not None:
+                symbol = {"USD": "$", "EUR": "€", "GBP": "£"}.get(currency, "")
+                amount_str = f"{symbol}{amount_total / 100:.2f} {currency}".strip()
+            else:
+                amount_str = plan.value.title()
+            email_service.send_payment_receipt(
+                to=user.email,
+                name=user.name,
+                amount=amount_str,
+                plan=plan.value.title(),
+                invoice_number=data.get("id"),
             )
 
     elif event_type in ("customer.subscription.updated", "customer.subscription.created"):
