@@ -16,21 +16,25 @@ from app.services.credits import (
 )
 from app.services.plans import effective_plan_info, list_published_plans
 
+# New tenants get a small free-trial credit grant to explore the product — not
+# the full Starter allowance. Paying (activating a plan) unlocks the plan credits.
+TRIAL_CREDITS = 10.0
+
 
 def ensure_subscription(db: Session, user_id: str) -> Subscription:
     sub = db.query(Subscription).filter(Subscription.user_id == user_id).first()
     if sub:
         return sub
-    # New tenants get a Starter trial so they can explore the product.
-    starter = effective_plan_info(db, PlanTier.STARTER)
+    # New tenants get a Starter trial with a fixed 10-credit grant.
     now = datetime.now(timezone.utc)
+    minutes_per_credit = get_platform_settings(db).minutes_per_credit or 1.0
     sub = Subscription(
         user_id=user_id,
         plan=PlanTier.STARTER,
         status=SubscriptionStatus.TRIALING,
-        minutes_limit=starter.minutes,
+        minutes_limit=int(TRIAL_CREDITS * minutes_per_credit),
         minutes_used=0,
-        credit_limit=float(starter.credits),
+        credit_limit=TRIAL_CREDITS,
         credits_used=0.0,
         topup_credits=0.0,
         current_period_start=now,
