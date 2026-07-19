@@ -20,7 +20,7 @@ export const DEFAULT_MARKETING_STORE: MarketingStore = {
         trialEnabled: true,
         trialDays: 14,
         features: [
-          "100 call minutes included",
+          "10 free credits included",
           "1 AI voice agent",
           "1 phone number",
           "Call recordings & transcripts",
@@ -28,7 +28,7 @@ export const DEFAULT_MARKETING_STORE: MarketingStore = {
           "Email support",
         ],
         limits: {
-          callMinutes: 100,
+          callMinutes: 10,
           aiAgents: 1,
           phoneNumbers: 1,
           campaigns: 1,
@@ -399,4 +399,4 @@ export const DEFAULT_MARKETING_STORE: MarketingStore = {
   },
 };
 
-export const STORAGE_KEY = "nextcall-marketing-store-v1";
+export const STORAGE_KEY = "nextcall-marketing-store-v2";
