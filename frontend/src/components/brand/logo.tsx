@@ -13,14 +13,14 @@ export function Logo({
 }) {
   return (
     <div className={cn("group flex items-center gap-2.5", className)}>
-      <span className="relative inline-flex transition-transform duration-300 ease-out group-hover:scale-105">
+      <span className="relative inline-flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 p-1 shadow-sm ring-1 ring-white/10 transition-transform duration-300 ease-out group-hover:scale-105">
         <Image
           src="/nextcall-logo.png"
           alt={`${APP_NAME} logo`}
           width={40}
           height={40}
           priority
-          className="relative size-9 object-contain"
+          className="relative size-full object-contain"
         />
       </span>
       {showText && (
