@@ -34,7 +34,7 @@ export function MarketingFooter() {
   return (
     <footer className="relative overflow-hidden border-t border-border/60 bg-card/30">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
-      <div className="pointer-events-none absolute -bottom-48 left-1/2 size-[38rem] -translate-x-1/2 rounded-full bg-violet-500/[0.06] blur-[110px]" />
+      <div className="pointer-events-none absolute -bottom-48 left-1/2 size-[38rem] -translate-x-1/2 rounded-full bg-primary/[0.04] blur-[110px]" />
       <div className="relative mx-auto max-w-7xl px-4 py-16 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-6">
           <div className="lg:col-span-2">

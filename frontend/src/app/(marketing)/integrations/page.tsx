@@ -21,7 +21,7 @@ export default function IntegrationsPage() {
               <span
                 className={cn(
                   "rounded-full px-2 py-0.5 text-[10px] font-medium uppercase",
-                  item.status === "available" && "bg-emerald-500/10 text-emerald-400",
+                  item.status === "available" && "bg-success/10 text-success",
                   item.status === "beta" && "bg-amber-500/10 text-amber-400",
                   item.status === "coming_soon" && "bg-muted text-muted-foreground"
                 )}

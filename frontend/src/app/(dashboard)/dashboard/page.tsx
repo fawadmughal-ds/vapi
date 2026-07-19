@@ -99,7 +99,7 @@ export default function DashboardPage() {
           value={formatNumber(subscription?.credits_remaining)}
           icon={Wallet}
           loading={loading}
-          accent="text-cyan-400"
+          accent="text-primary"
           hint={
             subscription
               ? `${formatNumber(subscription.credits_used)} used this period`
@@ -111,7 +111,7 @@ export default function DashboardPage() {
           value={`${s?.success_rate ?? 0}%`}
           icon={TrendingUp}
           loading={loading}
-          accent="text-emerald-400"
+          accent="text-success"
           trend={
             s && s.total_calls > 0
               ? { value: "Call completion health", positive: (s.success_rate ?? 0) >= 80 }
@@ -123,7 +123,7 @@ export default function DashboardPage() {
           value={setup.counts.agents + setup.counts.numbers}
           icon={Bot}
           loading={setup.loading}
-          accent="text-violet-400"
+          accent="text-violet-500"
           hint={`${setup.counts.agents} agents · ${setup.counts.numbers} numbers · ${setup.counts.integrations} providers`}
         />
       </div>
@@ -186,7 +186,7 @@ export default function DashboardPage() {
                               c.status === "in_progress"
                                 ? "status-dot status-dot-live"
                                 : c.status === "completed"
-                                  ? "status-dot bg-emerald-400/60"
+                                  ? "status-dot bg-success/60"
                                   : "status-dot bg-muted-foreground/30"
                             }
                           />
@@ -255,7 +255,7 @@ export default function DashboardPage() {
                   </span>
                   <span className="flex-1 text-sm font-medium">{item.label}</span>
                   {item.done ? (
-                    <span className="font-mono text-[10px] font-medium uppercase tracking-wider text-emerald-400">
+                    <span className="font-mono text-[10px] font-medium uppercase tracking-wider text-success">
                       Done
                     </span>
                   ) : (
@@ -294,7 +294,7 @@ export default function DashboardPage() {
                         {a.calls} calls · avg {formatDuration(a.avg_duration_seconds)}
                       </p>
                     </div>
-                    <span className="shrink-0 font-mono text-sm font-semibold tabular-nums text-emerald-400">
+                    <span className="shrink-0 font-mono text-sm font-semibold tabular-nums text-success">
                       {a.success_rate}%
                     </span>
                   </div>

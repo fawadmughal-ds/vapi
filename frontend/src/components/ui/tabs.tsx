@@ -39,7 +39,7 @@ export function TabsList({
   return (
     <div
       className={cn(
-        "inline-flex h-10 items-center gap-1 rounded-xl border border-border/70 bg-muted/30 p-1 backdrop-blur-sm",
+        "inline-flex h-10 items-center gap-1 rounded-chamfer border border-border/70 bg-muted/30 p-1 shadow-sm",
         className
       )}
       role="tablist"
@@ -68,9 +68,9 @@ export function TabsTrigger({
       aria-selected={active}
       onClick={() => ctx.onChange(value)}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-1.5 text-sm font-medium transition-all duration-200",
+        "inline-flex items-center justify-center gap-2 rounded-chamfer-sm px-3.5 py-1.5 text-sm font-medium transition-all duration-200",
         active
-          ? "bg-gradient-to-b from-card to-card/70 text-foreground shadow-[0_2px_10px_-4px_hsl(230_54%_2%/0.8),inset_0_1px_0_hsl(var(--foreground)/0.08)] ring-1 ring-primary/25"
+          ? "bg-gradient-to-b from-primary/15 to-card/70 text-primary shadow-[0_2px_12px_-4px_hsl(var(--primary)/0.45),inset_0_1px_0_hsl(var(--primary)/0.2)] ring-1 ring-primary/35"
           : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
         className
       )}

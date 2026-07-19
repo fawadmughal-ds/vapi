@@ -38,7 +38,7 @@ const MAP: Record<string, BadgeProps["variant"]> = {
 const DOT: Record<NonNullable<BadgeProps["variant"]>, string> = {
   default: "bg-primary",
   secondary: "bg-muted-foreground/50",
-  success: "bg-emerald-400",
+  success: "bg-success",
   warning: "bg-amber-400",
   destructive: "bg-destructive",
   outline: "bg-muted-foreground/50",

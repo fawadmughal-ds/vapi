@@ -44,11 +44,23 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        /* Legacy names kept for existing markup — now smooth, uniform corners */
+        chamfer: "0.75rem",
+        "chamfer-sm": "0.625rem",
+        "chamfer-lg": "1rem",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],

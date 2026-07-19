@@ -41,7 +41,7 @@ export function TopNav({ onMenu }: { onMenu: () => void }) {
   const isAdmin = user?.role === "super_admin";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-border/70 bg-background/65 px-4 shadow-[0_12px_36px_-32px_hsl(var(--glow-primary)/0.7)] backdrop-blur-2xl lg:px-6">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-xl lg:px-6">
       <Button
         variant="ghost"
         size="icon"
@@ -57,7 +57,7 @@ export function TopNav({ onMenu }: { onMenu: () => void }) {
           <input
             type="search"
             placeholder="Search agents, calls, numbers…"
-            className="h-10 w-full rounded-xl border border-border/70 bg-muted/25 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground/60 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.03)] transition-all focus:border-primary/50 focus:bg-card/70 focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="h-10 w-full rounded-chamfer border border-border bg-muted/50 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground/60 transition-all duration-200 focus:border-primary/50 focus:bg-card focus:outline-none focus:ring-2 focus:ring-primary/15"
             readOnly
             title="Global search coming soon"
           />
@@ -68,7 +68,7 @@ export function TopNav({ onMenu }: { onMenu: () => void }) {
         {sub && !isAdmin && (
           <Link
             href="/billing"
-            className="hidden min-w-[150px] rounded-xl border border-border/70 bg-muted/20 px-3 py-2 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.03)] transition-colors hover:border-primary/30 hover:bg-primary/[0.05] lg:block"
+            className="hidden min-w-[150px] rounded-chamfer border border-border bg-card px-3 py-2 transition-colors hover:border-primary/30 hover:bg-accent/50 lg:block"
           >
             <div className="mb-1 flex items-center justify-between gap-2">
               <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -104,9 +104,9 @@ export function TopNav({ onMenu }: { onMenu: () => void }) {
         <div className="relative" ref={ref}>
           <button
             onClick={() => setOpen((o) => !o)}
-            className="flex items-center gap-2 rounded-xl border border-transparent py-1 pl-1 pr-2 transition-all hover:border-primary/25 hover:bg-primary/[0.06]"
+            className="flex items-center gap-2 rounded-chamfer border border-transparent py-1 pl-1 pr-2 transition-all duration-200 hover:bg-muted"
           >
-            <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/25 to-cyan-500/10 text-xs font-semibold text-primary ring-1 ring-primary/20">
+            <span className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
               {initials(user?.name)}
             </span>
             <span className="hidden max-w-[120px] truncate text-sm font-medium lg:block">
@@ -116,7 +116,7 @@ export function TopNav({ onMenu }: { onMenu: () => void }) {
           </button>
 
           {open && (
-            <div className="glass-panel absolute right-0 mt-2 w-60 overflow-hidden rounded-2xl p-1 shadow-2xl animate-in">
+            <div className="glass-panel absolute right-0 mt-2 w-60 overflow-hidden p-1 shadow-2xl animate-in">
               <div className="border-b border-border/60 px-3 py-2.5">
                 <p className="truncate text-sm font-medium">{user?.name}</p>
                 <p className="truncate text-xs text-muted-foreground">

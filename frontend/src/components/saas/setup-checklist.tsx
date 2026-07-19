@@ -17,7 +17,7 @@ export function SetupChecklist({ verified }: { verified: boolean }) {
   if (loading || isComplete || dismissed) return null;
 
   return (
-    <div className="glass-card overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-cyan-500/5">
+    <div className="glass-card overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent">
       <div className="flex items-start justify-between gap-4 border-b border-border/50 px-5 py-4">
         <div>
           <div className="flex items-center gap-2">
@@ -51,7 +51,7 @@ export function SetupChecklist({ verified }: { verified: boolean }) {
               )}
             >
               {step.done ? (
-                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-400" />
+                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" />
               ) : (
                 <Circle className="mt-0.5 size-4 shrink-0 text-muted-foreground/50" />
               )}

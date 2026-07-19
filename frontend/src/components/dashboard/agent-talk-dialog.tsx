@@ -66,7 +66,7 @@ export function AgentTalkDialog({
               status === "active"
                 ? assistantSpeaking
                   ? "border-primary bg-primary/15 text-primary"
-                  : "border-emerald-500 bg-emerald-500/15 text-emerald-400"
+                  : "border-success bg-success/10 text-success"
                 : "border-border text-muted-foreground"
             )}
           >

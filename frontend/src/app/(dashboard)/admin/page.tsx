@@ -244,21 +244,21 @@ function AdminConsole() {
               value={formatNumber(stats?.total_agents)}
               icon={Bot}
               loading={!stats}
-              accent="text-indigo-400"
+              accent="text-violet-500"
             />
             <StatCard
               label="Total Calls"
               value={formatNumber(stats?.total_calls)}
               icon={PhoneCall}
               loading={!stats}
-              accent="text-sky-400"
+              accent="text-primary"
             />
             <StatCard
               label="Est. MRR"
               value={formatCurrency(stats?.total_revenue_estimate)}
               icon={DollarSign}
               loading={!stats}
-              accent="text-emerald-400"
+              accent="text-success"
             />
             <StatCard
               label="Provider Cost"

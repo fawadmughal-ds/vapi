@@ -189,13 +189,13 @@ export function AgentAnalysis({ agentId }: { agentId: string }) {
         label="Avg duration"
         value={formatDuration(Math.round(stats.avg))}
         icon={TrendingUp}
-        accent="text-indigo-400"
+        accent="text-violet-500"
       />
       <StatCard
         label="Success rate"
         value={`${stats.successRate.toFixed(0)}%`}
         icon={TrendingUp}
-        accent="text-emerald-400"
+        accent="text-success"
       />
       <StatCard
         label="Credits used"

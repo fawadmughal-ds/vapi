@@ -46,7 +46,7 @@ export function VapiBalance() {
       <CardContent className="space-y-4 p-5">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-success/10 text-success">
               <Wallet className="size-5" />
             </div>
             <div>
@@ -138,7 +138,7 @@ function Metric({
   return (
     <div className="rounded-lg border border-border p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`mt-0.5 text-xl font-semibold ${accent ? "text-emerald-400" : ""}`}>
+      <p className={`mt-0.5 text-xl font-semibold ${accent ? "text-success" : ""}`}>
         {value}
       </p>
       {sub && <p className="text-xs text-muted-foreground">{sub}</p>}

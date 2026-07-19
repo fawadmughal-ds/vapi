@@ -86,7 +86,7 @@ export function AdminPricingPanel() {
                     className={cn(
                       "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
                       display.published
-                        ? "bg-emerald-500/15 text-emerald-400"
+                        ? "bg-success/10 text-success"
                         : "bg-muted text-muted-foreground"
                     )}
                   >
@@ -190,7 +190,7 @@ export function AdminPricingPanel() {
                   <ul className="flex-1 space-y-2">
                     {display.features.map((f) => (
                       <li key={f} className="flex items-start gap-2 text-sm">
-                        <Check className="mt-0.5 size-4 shrink-0 text-emerald-400" />
+                        <Check className="mt-0.5 size-4 shrink-0 text-success" />
                         {f}
                       </li>
                     ))}

@@ -91,7 +91,7 @@ function RegisterForm() {
               </div>
               <div className="text-right">
                 {plan.monthlyPrice === 0 ? (
-                  <span className="font-semibold text-emerald-400">Free</span>
+                  <span className="font-semibold text-success">Free</span>
                 ) : (
                   <span className="font-semibold">
                     {formatCurrency(getPlanPrice(plan, "monthly"))}

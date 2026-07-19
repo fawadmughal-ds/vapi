@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 
 import { JsonLd } from "@/components/seo/json-ld";
@@ -21,12 +21,12 @@ import {
 } from "@/lib/seo/site";
 import "./globals.css";
 
-const geist = Geist({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
 });
-const geistMono = Geist_Mono({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
@@ -87,11 +87,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#04060f" },
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-  ],
-  colorScheme: "dark light",
+  themeColor: "#fcfcfa",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -103,8 +100,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <JsonLd
           schema={[
             organizationSchema(),

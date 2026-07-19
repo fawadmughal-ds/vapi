@@ -41,7 +41,7 @@ export function StatCard({
             <p
               className={cn(
                 "inline-flex items-center gap-1 text-xs font-medium",
-                trend.positive ? "text-emerald-400" : "text-muted-foreground"
+                trend.positive ? "text-success" : "text-muted-foreground"
               )}
             >
               {trend.positive ? (
@@ -55,7 +55,7 @@ export function StatCard({
         </div>
         <div
           className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 via-muted/70 to-violet-500/10 ring-1 ring-primary/15 transition-all duration-300 group-hover:scale-105 group-hover:ring-primary/35",
+            "flex size-10 shrink-0 items-center justify-center rounded-chamfer-sm bg-gradient-to-br from-primary/15 via-muted/70 to-transparent ring-1 ring-primary/20 transition-all duration-300 group-hover:scale-105 group-hover:ring-primary/40",
             accent
           )}
         >

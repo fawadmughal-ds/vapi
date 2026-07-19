@@ -55,19 +55,19 @@ export function AdminAnalytics() {
           label="Minutes"
           value={formatNumber(s.minutes_used)}
           icon={Clock}
-          accent="text-indigo-400"
+          accent="text-violet-500"
         />
         <StatCard
           label="Avg Duration"
           value={formatDuration(s.avg_duration_seconds)}
           icon={Timer}
-          accent="text-sky-400"
+          accent="text-primary"
         />
         <StatCard
           label="Success Rate"
           value={`${s.success_rate}%`}
           icon={TrendingUp}
-          accent="text-emerald-400"
+          accent="text-success"
         />
         <StatCard
           label="Provider Cost"
@@ -170,7 +170,7 @@ export function AdminAnalytics() {
                         {formatDuration(a.avg_duration_seconds)}
                       </p>
                     </div>
-                    <span className="text-sm font-medium text-emerald-400">
+                    <span className="text-sm font-medium text-success">
                       {a.success_rate}%
                     </span>
                   </div>

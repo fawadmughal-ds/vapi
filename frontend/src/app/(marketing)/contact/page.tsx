@@ -54,7 +54,7 @@ export default function ContactPage() {
         description="We've received your inquiry and will respond shortly."
       >
         <div className="mx-auto max-w-md text-center">
-          <CheckCircle2 className="mx-auto size-12 text-emerald-400" />
+          <CheckCircle2 className="mx-auto size-12 text-success" />
           <p className="mt-4 text-muted-foreground">
             A member of our team will reach out to discuss your use case and schedule
             a demo if requested.
@@ -75,7 +75,7 @@ export default function ContactPage() {
         </p>
         <a
           href="mailto:info@nextcall.online"
-          className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/[0.08] px-4 py-1.5 text-sm font-medium text-primary shadow-[0_0_24px_-12px_hsl(var(--primary)/0.9)] transition-colors hover:bg-primary/[0.14]"
+          className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.06] px-4 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/[0.14]"
         >
           <Mail className="size-4" />
           info@nextcall.online

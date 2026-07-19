@@ -158,7 +158,7 @@ export default function SquadsPage() {
                     className={cn(
                       "rounded-full px-2 py-0.5 text-xs font-medium",
                       s.is_provisioned
-                        ? "bg-emerald-500/15 text-emerald-400"
+                        ? "bg-success/10 text-success"
                         : "bg-muted text-muted-foreground"
                     )}
                   >

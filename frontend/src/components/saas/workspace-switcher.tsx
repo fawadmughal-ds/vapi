@@ -25,7 +25,7 @@ export function WorkspaceSwitcher({ compact }: { compact?: boolean }) {
       )}
     >
       <div className="flex items-start gap-3">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-cyan-500/10 text-sm font-semibold text-primary ring-1 ring-primary/20">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 text-sm font-semibold text-primary ring-1 ring-primary/20">
           {initials(workspaceName) || workspaceInitial}
         </div>
         <div className="min-w-0 flex-1">
@@ -47,7 +47,7 @@ export function WorkspaceSwitcher({ compact }: { compact?: boolean }) {
                   <Building2 className="size-2.5" />
                   Isolated workspace
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-400">
+                <span className="inline-flex items-center gap-1 rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-medium text-success">
                   <Shield className="size-2.5" />
                   Tenant-scoped
                 </span>

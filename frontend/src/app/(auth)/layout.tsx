@@ -22,17 +22,16 @@ export default function AuthLayout({
           <Logo />
         </Link>
         <div className="flex flex-1 items-center justify-center py-8">
-          <div className="glass-panel w-full max-w-[430px] rounded-3xl p-6 shadow-[0_28px_90px_-48px_hsl(var(--glow-primary)/0.65)] animate-slide-up sm:p-8">{children}</div>
+          <div className="glass-panel w-full max-w-[430px] p-6 animate-slide-up sm:p-8">{children}</div>
         </div>
         <p className="text-center text-xs text-muted-foreground/60 lg:text-left">
           Enterprise-grade AI voice infrastructure · SOC 2 ready · Tenant isolated
         </p>
       </div>
       <div className="relative hidden overflow-hidden border-l border-border/50 lg:block">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-violet-500/10" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--glow-cyan)/0.18),transparent_50%)] animate-aurora" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-background to-transparent" />
         <div className="relative flex h-full flex-col justify-center px-14 xl:px-20">
-          <p className="mb-6 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/80">
+          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
             AI Voice Operating System
           </p>
           <h2 className="max-w-lg text-3xl font-semibold leading-tight tracking-tight xl:text-4xl">
@@ -66,7 +65,7 @@ export default function AuthLayout({
               },
             ].map((item) => (
               <li key={item.title} className="flex gap-3">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10">
                   <item.icon className="size-4 text-primary" />
                 </div>
                 <div>

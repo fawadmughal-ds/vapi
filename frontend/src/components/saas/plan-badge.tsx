@@ -8,8 +8,8 @@ const PLAN_LABELS: Record<PlanTier, string> = {
 };
 
 const STATUS_STYLES: Record<SubscriptionStatus, string> = {
-  active: "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20",
-  trialing: "bg-cyan-500/10 text-cyan-400 ring-cyan-500/20",
+  active: "bg-success/10 text-success ring-success/20",
+  trialing: "bg-primary/10 text-primary ring-primary/20",
   past_due: "bg-destructive/10 text-destructive ring-destructive/20",
   canceled: "bg-muted text-muted-foreground ring-border",
   inactive: "bg-muted text-muted-foreground ring-border",

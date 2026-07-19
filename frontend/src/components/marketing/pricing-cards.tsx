@@ -61,7 +61,7 @@ export function PricingCards({
                   : "text-muted-foreground"
               )}
             >
-              Yearly <span className="text-emerald-400">Save 20%</span>
+              Yearly <span className="text-success">Save 20%</span>
             </button>
           </div>
         </div>
@@ -83,7 +83,7 @@ export function PricingCards({
               className={cn(
                 "glass-card-hover relative flex flex-col p-6",
                 plan.isPopular && "border-primary/40 glow-sm",
-                plan.isEnterprise && "border-violet-500/30"
+                plan.isEnterprise && "border-violet-300/60"
               )}
             >
               {plan.isPopular && (
@@ -110,14 +110,14 @@ export function PricingCards({
                 )}
               </div>
               {plan.trialEnabled && plan.trialDays > 0 && !plan.isEnterprise && (
-                <p className="mt-1 text-xs text-cyan-400">
+                <p className="mt-1 text-xs text-primary">
                   {plan.trialDays}-day free trial included
                 </p>
               )}
               <ul className="mt-5 flex-1 space-y-2">
                 {plan.features.slice(0, compact ? 5 : 8).map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check className="mt-0.5 size-4 shrink-0 text-emerald-400" />
+                    <Check className="mt-0.5 size-4 shrink-0 text-success" />
                     {f}
                   </li>
                 ))}

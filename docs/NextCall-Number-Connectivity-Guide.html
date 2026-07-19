@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NextCall — Number Connectivity & AI Voice Agent Quotation</title>
+<style>
+  :root {
+    --navy: #0b1220;
+    --navy-2: #0f172a;
+    --ink: #1e293b;
+    --slate: #475569;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --line-soft: #eef2f7;
+    --cyan: #06b6d4;
+    --cyan-d: #0891b2;
+    --violet: #7c3aed;
+    --paper: #ffffff;
+    --paper-2: #f8fafc;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.55;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    size: A4;
+    margin: 16mm 14mm 18mm 14mm;
+  }
+
+  /* Cover uses its own full-bleed page with no margins */
+  @page cover { margin: 0; }
+
+  .page-break { page-break-after: always; break-after: page; }
+  .avoid-break { page-break-inside: avoid; break-inside: avoid; }
+
+  h1, h2, h3, h4 { color: var(--navy-2); margin: 0 0 8px; line-height: 1.25; }
+  h2 { font-size: 19px; letter-spacing: -0.2px; }
+  h3 { font-size: 15px; }
+  p { margin: 0 0 9px; color: var(--slate); }
+  strong { color: var(--ink); }
+  small { color: var(--muted); }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    page: cover;
+    position: relative;
+    height: 297mm;
+    width: 210mm;
+    background:
+      radial-gradient(1100px 520px at 78% -8%, rgba(124,58,237,0.55), transparent 60%),
+      radial-gradient(900px 520px at 8% 108%, rgba(6,182,212,0.45), transparent 60%),
+      linear-gradient(160deg, #0b1220 0%, #0f172a 55%, #111a33 100%);
+    color: #e6edf7;
+    overflow: hidden;
+    page-break-after: always;
+  }
+  .cover .glow {
+    position: absolute; border-radius: 50%;
+    filter: blur(10px); opacity: 0.5;
+  }
+  .cover .aurora {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(500px 200px at 65% 22%, rgba(56,189,248,0.20), transparent 70%),
+      radial-gradient(420px 200px at 30% 62%, rgba(167,139,250,0.20), transparent 70%);
+  }
+  .cover-inner {
+    position: absolute; inset: 0;
+    padding: 30mm 24mm;
+    display: flex; flex-direction: column;
+  }
+  .brand-row { display: flex; align-items: center; gap: 14px; }
+  .brand-row img { width: 54px; height: 54px; border-radius: 14px;
+    box-shadow: 0 8px 30px rgba(6,182,212,0.35); }
+  .brand-name { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+  .brand-tag { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #7dd3fc; margin-top: 2px; }
+
+  .cover-title-wrap { margin-top: auto; }
+  .eyebrow {
+    display: inline-block; font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: #a5b4fc; border: 1px solid rgba(165,180,252,0.35);
+    padding: 5px 12px; border-radius: 999px; margin-bottom: 18px;
+  }
+  .cover h1 {
+    color: #ffffff; font-size: 40px; line-height: 1.08; letter-spacing: -1px;
+    margin: 0 0 14px; max-width: 15em;
+  }
+  .cover h1 .accent {
+    background: linear-gradient(90deg, #22d3ee, #a78bfa);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .cover .lede { color: #b9c6db; font-size: 14px; max-width: 30em; }
+
+  .cover-meta {
+    margin-top: 26mm; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px;
+    border-top: 1px solid rgba(255,255,255,0.14); padding-top: 16px; max-width: 460px;
+  }
+  .cover-meta .k { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #7f8ea8; }
+  .cover-meta .v { font-size: 13px; color: #e6edf7; font-weight: 600; }
+
+  .cover-footer {
+    position: absolute; left: 24mm; right: 24mm; bottom: 18mm;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: #8595ad;
+  }
+
+  /* ---------- CONTENT ---------- */
+  .section-head { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; }
+  .section-head .bar { width: 5px; height: 26px; border-radius: 3px;
+    background: linear-gradient(180deg, var(--cyan), var(--violet)); }
+  .section-head .idx { font-size: 11px; color: var(--cyan-d); font-weight: 700; letter-spacing: 1.5px; }
+
+  .lead-box {
+    background: var(--paper-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; margin: 0 0 16px;
+  }
+
+  .two-layer { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
+  .layer {
+    border: 1px solid var(--line); border-radius: 12px; padding: 13px 15px; background: #fff;
+  }
+  .layer .pill { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: #fff; padding: 3px 9px; border-radius: 999px; margin-bottom: 7px; }
+  .layer.telephony .pill { background: var(--cyan-d); }
+  .layer.portal .pill { background: var(--violet); }
+
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 11.5px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  thead th {
+    background: linear-gradient(180deg, #f1f5f9, #e9eef5);
+    color: var(--navy-2); font-size: 10.5px; letter-spacing: 0.6px; text-transform: uppercase;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody tr:nth-child(even) td { background: #fbfcfe; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .total-row td { font-weight: 800; color: var(--navy-2); background: #eef6f9 !important;
+    border-top: 2px solid var(--cyan); font-size: 12.5px; }
+
+  /* Route cards */
+  .route {
+    border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+    margin-bottom: 16px; background: #fff;
+  }
+  .route-head {
+    padding: 14px 18px; color: #fff; display: flex; align-items: center; gap: 14px;
+  }
+  .route-1 .route-head { background: linear-gradient(120deg, #0891b2, #06b6d4); }
+  .route-2 .route-head { background: linear-gradient(120deg, #4f46e5, #7c3aed); }
+  .route-3 .route-head { background: linear-gradient(120deg, #0d9488, #059669); }
+  .route-head .rnum {
+    width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px;
+  }
+  .route-head h3 { color: #fff; margin: 0; font-size: 16px; }
+  .route-head .sub { color: rgba(255,255,255,0.85); font-size: 11px; margin-top: 1px; }
+  .route-body { padding: 15px 18px; }
+
+  .kv { display: grid; grid-template-columns: 130px 1fr; gap: 4px 12px; margin: 4px 0 12px; }
+  .kv .k { color: var(--muted); font-size: 11px; }
+  .kv .v { color: var(--ink); font-size: 11.5px; }
+
+  .steps { counter-reset: step; margin: 6px 0 12px; padding: 0; list-style: none; }
+  .steps li {
+    position: relative; padding: 0 0 10px 34px; margin: 0;
+    border-left: 2px solid var(--line); margin-left: 11px;
+  }
+  .steps li:last-child { border-left: 2px solid transparent; padding-bottom: 0; }
+  .steps li::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: -13px; top: -2px; width: 24px; height: 24px; border-radius: 50%;
+    background: #fff; border: 2px solid var(--cyan); color: var(--cyan-d);
+    font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center;
+  }
+  .steps li .st { font-weight: 700; color: var(--navy-2); display: block; margin-bottom: 1px; font-size: 12px; }
+  .steps li .sd { color: var(--slate); font-size: 11px; }
+
+  .callout {
+    border-radius: 12px; padding: 12px 14px; margin: 10px 0; font-size: 11.5px;
+    border: 1px solid #bae6fd; background: #f0f9ff; color: #0c4a6e;
+  }
+  .callout.warn { border-color: #fed7aa; background: #fff7ed; color: #9a3412; }
+  .callout.go { border-color: #bbf7d0; background: #f0fdf4; color: #166534; }
+  .callout .ct { font-weight: 800; display: block; margin-bottom: 3px; letter-spacing: 0.3px; }
+
+  .proscons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  .proscons ul { margin: 4px 0 0; padding-left: 16px; }
+  .proscons li { font-size: 11px; margin-bottom: 3px; }
+  .pros h4 { color: #15803d; font-size: 12px; }
+  .cons h4 { color: #b91c1c; font-size: 12px; }
+
+  .badge { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; }
+  .b-once { background:#ecfeff; color:#0e7490; border:1px solid #a5f3fc; }
+  .b-month { background:#f5f3ff; color:#6d28d9; border:1px solid #ddd6fe; }
+  .b-min { background:#fefce8; color:#a16207; border:1px solid #fde68a; }
+
+  .cmp td:first-child { font-weight: 600; color: var(--navy-2); }
+  .yes { color: #16a34a; font-weight: 700; }
+  .no { color: #dc2626; font-weight: 700; }
+
+  .reco {
+    border: 1px solid var(--line); border-left: 5px solid var(--cyan);
+    border-radius: 12px; padding: 12px 16px; margin: 8px 0; background: #fff;
+  }
+  .reco b { color: var(--navy-2); }
+
+  .note { font-size: 10.5px; color: var(--muted); }
+  .footer-line { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px;
+    display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); }
+
+  .kicker { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cyan-d); font-weight: 700; margin-bottom: 4px; }
+
+  /* Pricing plan cards */
+  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 10px 0 16px; }
+  .plan-card { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #fff;
+    box-shadow: 0 6px 18px rgba(15,23,42,0.05); position: relative; }
+  .plan-card.featured { border-color: #a78bfa; box-shadow: 0 10px 26px rgba(124,58,237,0.16); }
+  .plan-card .ph { padding: 13px 16px; color: #fff; }
+  .plan-card.s .ph { background: linear-gradient(120deg, #0891b2, #06b6d4); }
+  .plan-card.g .ph { background: linear-gradient(120deg, #4f46e5, #7c3aed); }
+  .plan-card.p .ph { background: linear-gradient(120deg, #0d9488, #059669); }
+  .plan-card .ph .name { font-size: 15px; font-weight: 800; letter-spacing: 0.6px; }
+  .plan-card .ph .mins { font-size: 11px; opacity: 0.92; margin-top: 1px; }
+  .plan-card .pb { padding: 14px 16px; }
+  .plan-card .price { font-size: 25px; font-weight: 800; color: var(--navy-2); line-height: 1.1; }
+  .plan-card .per { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .plan-card .feat { list-style: none; padding: 0; margin: 10px 0 0; }
+  .plan-card .feat li { font-size: 11px; color: var(--slate); padding: 5px 0 5px 18px;
+    position: relative; border-top: 1px solid var(--line-soft); }
+  .plan-card .feat li::before { content: "\2713"; color: #16a34a; position: absolute; left: 0; font-weight: 800; }
+  .ribbon { position: absolute; top: 12px; right: -30px; transform: rotate(45deg);
+    background: #7c3aed; color: #fff; font-size: 9px; font-weight: 800; letter-spacing: 1px;
+    padding: 3px 34px; text-transform: uppercase; }
+
+  .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+  .pay-box { border: 1px solid var(--line); border-radius: 12px; padding: 12px 15px; background: #fff; }
+  .pay-box h4 { font-size: 12.5px; margin-bottom: 6px; color: var(--navy-2); }
+  .pay-box ul { margin: 0; padding-left: 16px; }
+  .pay-box li { font-size: 11px; color: var(--slate); margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ============== COVER ============== -->
+<section class="cover">
+  <div class="aurora"></div>
+  <div class="cover-inner">
+    <div class="brand-row">
+      <img src="file:///home/developer/Desktop/VApi/frontend/public/nextcall-logo.png" alt="NextCall" />
+      <div>
+        <div class="brand-name">NextCall</div>
+        <div class="brand-tag">AI Voice Agent Platform</div>
+      </div>
+    </div>
+
+    <div class="cover-title-wrap">
+      <span class="eyebrow">Quotation &amp; Setup Guide</span>
+      <h1>Bringing Your Phone Number <span class="accent">Online with AI</span></h1>
+      <p class="lede">Three proven routes to connect your Jazz / local number to a NextCall
+      AI voice agent — with step-by-step routing, provider contacts, and transparent pricing.</p>
+    </div>
+
+    <div class="cover-meta">
+      <div><div class="k">Prepared for</div><div class="v">[Client Name / Company]</div></div>
+      <div><div class="k">Prepared by</div><div class="v">NextCall</div></div>
+      <div><div class="k">Date</div><div class="v">[DD Month 2026]</div></div>
+      <div><div class="k">Quotation valid till</div><div class="v">[DD Month 2026]</div></div>
+      <div><div class="k">Contact</div><div class="v">info@nextcall.online</div></div>
+      <div><div class="k">Website</div><div class="v">www.nextcall.online</div></div>
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    <span>NextCall &middot; AI Voice Agents for Business</span>
+    <span>Confidential — for the named recipient only</span>
+  </div>
+</section>
+
+<!-- ============== OVERVIEW ============== -->
+<section>
+  <div class="section-head">
+    <span class="bar"></span>
+    <div>
+      <div class="idx">SECTION 01</div>
+      <h2>Overview &amp; How Billing Works</h2>
+    </div>
+  </div>
+
+  <div class="lead-box">
+    <p style="margin-bottom:0">To have a NextCall AI voice agent answer real phone calls, your number must reach
+    our calling engine over the internet (SIP). There are <strong>three routes</strong> to achieve this.
+    This document explains how each works, <strong>exactly where you need to go</strong> (Jazz / mobile
+    operator or a local carrier), and the full cost breakdown so you can choose confidently.</p>
+  </div>
+
+  <p>Every route has <strong>two cost layers</strong>. The telephony layer changes per route; the NextCall
+  portal layer is the same for all three.</p>
+
+  <div class="two-layer">
+    <div class="layer telephony">
+      <span class="pill">Layer 1 — Telephony</span>
+      <p style="margin-bottom:0">The cost of the line / number itself: the SIM gateway device, the Twilio
+      cloud number + forwarding, or the local SIP trunk &amp; DID. This is paid to the hardware vendor or
+      the telecom operator.</p>
+    </div>
+    <div class="layer portal">
+      <span class="pill">Layer 2 — NextCall Portal</span>
+      <p style="margin-bottom:0">The AI agent usage, billed by NextCall in <strong>credits</strong>
+      (credits = talk minutes). Includes the dashboard, agents, analytics, call recordings and support.</p>
+    </div>
+  </div>
+
+  <div class="callout warn avoid-break">
+    <span class="ct">Important — Pakistani numbers &amp; Twilio</span>
+    Twilio does <strong>not</strong> sell voice-enabled Pakistani (+92) numbers. Route&nbsp;2 therefore uses a
+    <strong>foreign cloud number</strong> (US/UK) that your Jazz number forwards to. Routes&nbsp;1 and&nbsp;3
+    keep or provide a genuine local number. This is a regulatory limitation, not a NextCall limitation.
+  </div>
+
+  <div class="footer-line">
+    <span>NextCall — Number Connectivity &amp; AI Voice Agent Quotation</span>
+    <span>www.nextcall.online</span>
+  </div>
+</section>
+
+<div class="page-break"></div>
+
+<!-- ============== ROUTE 1 ============== -->
+<section>
+  <div class="section-head">
+    <span class="bar"></span>
+    <div>
+      <div class="idx">SECTION 02 — ROUTE A</div>
+      <h2>The Three Routes to Go Live</h2>
+    </div>
+  </div>
+
+  <div class="route route-1 avoid-break">
+    <div class="route-head">
+      <div class="rnum">1</div>
+      <div>
+        <h3>SIM Gateway Device</h3>
+        <div class="sub">Keep your exact Jazz / Zong number &middot; one-time hardware</div>
+      </div>
+    </div>
+    <div class="route-body">
+      <div class="kv">
+        <div class="k">How it works</div>
+        <div class="v">A small GSM/VoLTE gateway holds the physical SIM and converts it into a SIP line that
+          connects to the NextCall AI agent. Callers dial the <strong>same number</strong>; the AI answers.</div>
+        <div class="k">Best for</div>
+        <div class="v">Clients who must keep their current Jazz number and expect steady call volume.</div>
+      </div>
+
+      <div class="kicker">Step-by-step — where to go</div>
+      <ul class="steps">
+        <li><span class="st">Choose &amp; buy the gateway device</span><span class="sd">Order a 1‑SIM GSM/VoLTE gateway (Yeastar / Dinstar) from a local VoIP hardware vendor. NextCall shares recommended models &amp; a verified vendor.</span></li>
+        <li><span class="st">Prepare the SIM (Jazz Business Center / franchise)</span><span class="sd">Use the existing Jazz SIM, or get a Jazz <strong>Business</strong> SIM from a Jazz Business Center. Confirm a voice/minutes bundle suitable for your call volume.</span></li>
+        <li><span class="st">Install the device on-site</span><span class="sd">Insert the SIM, connect the gateway to power and internet (LAN). A static IP or router port-forwarding is recommended.</span></li>
+        <li><span class="st">NextCall connects the gateway to your agent</span><span class="sd">We configure the SIP trunk credential in the platform (BYO SIP) and link it to your AI agent — no number change.</span></li>
+        <li><span class="st">Test &amp; go live</span><span class="sd">We run test calls, tune the agent, then hand over. Callers now reach the AI on your existing number.</span></li>
+      </ul>
+
+      <div class="callout go">
+        <span class="ct">Where you physically go</span>
+        Hardware vendor (device) &rarr; Jazz Business Center / franchise (SIM &amp; bundle). No number porting needed.
+      </div>
+
+      <table>
+        <thead><tr><th>Cost item</th><th>Type</th><th class="num">Indicative price</th></tr></thead>
+        <tbody>
+          <tr><td>1‑SIM VoLTE gateway (Yeastar / Dinstar)</td><td><span class="badge b-once">One-time</span></td><td class="num">PKR 35,000 – 55,000</td></tr>
+          <tr><td>Multi‑SIM gateway (4–16 SIM, for scale)</td><td><span class="badge b-once">One-time</span></td><td class="num">PKR 70,000 – 150,000+</td></tr>
+          <tr><td>Jazz SIM airtime / minutes bundle</td><td><span class="badge b-month">Monthly</span></td><td class="num">Per Jazz package</td></tr>
+          <tr><td>Site internet</td><td><span class="badge b-month">Monthly</span></td><td class="num">Existing line</td></tr>
+        </tbody>
+      </table>
+
+      <div class="proscons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Keeps the exact existing number</li>
+          <li>Lowest ongoing cost (local SIM rates)</li>
+          <li>Full control of the SIM &amp; device</li>
+        </ul></div>
+        <div class="cons"><h4>Considerations</h4><ul>
+          <li>Upfront hardware cost</li>
+          <li>Needs reliable on-site power &amp; internet</li>
+          <li>Best on a Business SIM (check operator terms)</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-line">
+    <span>NextCall — Number Connectivity &amp; AI Voice Agent Quotation</span>
+    <span>www.nextcall.online</span>
+  </div>
+</section>
+
+<div class="page-break"></div>
+
+<!-- ============== ROUTE 2 ============== -->
+<section>
+  <div class="route route-2 avoid-break">
+    <div class="route-head">
+      <div class="rnum">2</div>
+      <div>
+        <h3>Cloud Number + Call Forwarding (Twilio)</h3>
+        <div class="sub">Fastest to launch &middot; foreign number &middot; monthly rental</div>
+      </div>
+    </div>
+    <div class="route-body">
+      <div class="kv">
+        <div class="k">How it works</div>
+        <div class="v">NextCall provisions a Twilio cloud number connected to your AI agent. Your Jazz number is
+          set to <strong>forward incoming calls</strong> to that number, so the AI answers every call.</div>
+        <div class="k">Best for</div>
+        <div class="v">Quick pilots, or businesses whose callers are mostly international.</div>
+      </div>
+
+      <div class="kicker">Step-by-step — where to go</div>
+      <ul class="steps">
+        <li><span class="st">NextCall buys &amp; configures the cloud number</span><span class="sd">We provision a Twilio number (US/UK) and attach it to your AI agent. Nothing for you to install.</span></li>
+        <li><span class="st">Enable international forwarding on your Jazz number</span><span class="sd">Visit a <strong>Jazz Business Center</strong> or call the <strong>Jazz helpline (111)</strong> and request that <strong>International Call Forwarding / IDD</strong> be enabled on your number (usually requires a postpaid/Business line).</span></li>
+        <li><span class="st">Set the call-forward to our number</span><span class="sd">Activate “forward all calls” to the Twilio number NextCall provides. Typical GSM code: <strong>**21*&lt;number&gt;#</strong> then dial; deactivate with <strong>##21#</strong>. Jazz Business can also set this for you.</span></li>
+        <li><span class="st">Test &amp; go live</span><span class="sd">We place test calls to your Jazz number to confirm the AI answers via the forwarded leg.</span></li>
+      </ul>
+
+      <div class="callout warn">
+        <span class="ct">Cost warning — international forwarding</span>
+        Because the Twilio number is foreign, the <strong>Jazz forwarding leg is billed at Jazz’s
+        international/IDD rate</strong>. For Pakistan-heavy call traffic this is usually the most expensive
+        route per minute. Ideal for pilots, not high local volume.
+      </div>
+
+      <div class="callout go">
+        <span class="ct">Where you physically go</span>
+        Jazz Business Center / Jazz Helpline 111 (to enable + set international forwarding). NextCall handles Twilio.
+      </div>
+
+      <table>
+        <thead><tr><th>Cost item</th><th>Type</th><th class="num">Indicative price</th></tr></thead>
+        <tbody>
+          <tr><td>Twilio international number rental</td><td><span class="badge b-month">Monthly</span></td><td class="num">USD 30 / mo</td></tr>
+          <tr><td>Twilio call charge (per minute)</td><td><span class="badge b-min">Per minute</span></td><td class="num">USD 0.85 / min</td></tr>
+          <tr><td>Jazz &rarr; Twilio forwarding leg</td><td><span class="badge b-min">Per minute</span></td><td class="num">Jazz IDD / intl rate (separate)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="proscons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>No hardware — fastest setup</li>
+          <li>Great for outbound / global calling</li>
+          <li>Scales instantly</li>
+        </ul></div>
+        <div class="cons"><h4>Considerations</h4><ul>
+          <li>Not a real +92 number</li>
+          <li>Expensive intl forwarding for PK traffic</li>
+          <li>Monthly rental + forwarding airtime</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-line">
+    <span>NextCall — Number Connectivity &amp; AI Voice Agent Quotation</span>
+    <span>www.nextcall.online</span>
+  </div>
+</section>
+
+<div class="page-break"></div>
+
+<!-- ============== ROUTE 3 ============== -->
+<section>
+  <div class="route route-3 avoid-break">
+    <div class="route-head">
+      <div class="rnum">3</div>
+      <div>
+        <h3>New Local SIP Number (Nayatel / PTCL) + NextCall</h3>
+        <div class="sub">Cleanest, legal, best for volume &middot; genuine local +92 number</div>
+      </div>
+    </div>
+    <div class="route-body">
+      <div class="kv">
+        <div class="k">How it works</div>
+        <div class="v">A licensed local carrier (Nayatel, PTCL, etc.) delivers a new <strong>local number (DID)</strong>
+          over a <strong>SIP trunk</strong> that connects straight to the NextCall AI agent. The most reliable,
+          fully-compliant setup.</div>
+        <div class="k">Best for</div>
+        <div class="v">Professional / long-term deployments and higher call volumes.</div>
+      </div>
+
+      <div class="kicker">Step-by-step — where to go</div>
+      <ul class="steps">
+        <li><span class="st">Contact the carrier’s business sales</span><span class="sd">Reach <strong>Nayatel</strong> (nayatel.com/business/sip-trunk) or <strong>PTCL</strong> Enterprise (helpline 1218, care@ptcl.net.pk) and request a <strong>SIP Trunk + DID</strong>.</span></li>
+        <li><span class="st">Order channels &amp; DID number(s)</span><span class="sd">Pick the number of concurrent channels (calls at once) and how many local numbers (DIDs) you need. They quote a monthly rate.</span></li>
+        <li><span class="st">Carrier provisions the trunk</span><span class="sd">They deliver SIP credentials (host, username, password / IP) once your business documents &amp; internet are in place.</span></li>
+        <li><span class="st">NextCall connects the trunk to your agent</span><span class="sd">We add the SIP credential (BYO SIP) in the platform and bind your new local number to the AI agent.</span></li>
+        <li><span class="st">Test &amp; go live</span><span class="sd">We validate quality &amp; concurrency, then publish your new professional local number.</span></li>
+      </ul>
+
+      <div class="callout go">
+        <span class="ct">Where you physically go</span>
+        Nayatel / PTCL business sales (order SIP trunk + DID). NextCall does the technical connection.
+      </div>
+
+      <table>
+        <thead><tr><th>Cost item</th><th>Type</th><th class="num">Indicative price</th></tr></thead>
+        <tbody>
+          <tr><td>SIP trunk (per channel)</td><td><span class="badge b-month">Monthly</span></td><td class="num">Carrier quote</td></tr>
+          <tr><td>Local DID number(s)</td><td><span class="badge b-month">Monthly</span></td><td class="num">Carrier quote (per DID)</td></tr>
+          <tr><td>Local call minutes</td><td><span class="badge b-min">Per minute</span></td><td class="num">Low (domestic)</td></tr>
+          <tr><td>Setup / installation</td><td><span class="badge b-once">One-time</span></td><td class="num">Carrier quote</td></tr>
+        </tbody>
+      </table>
+
+      <div class="proscons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Real, legal, high-quality local +92 number</li>
+          <li>Low domestic per-minute cost</li>
+          <li>Scales with channels; no hardware</li>
+        </ul></div>
+        <div class="cons"><h4>Considerations</h4><ul>
+          <li>New number (not the existing Jazz number)</li>
+          <li>Requires a carrier contract &amp; docs</li>
+          <li>Short provisioning lead time</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-line">
+    <span>NextCall — Number Connectivity &amp; AI Voice Agent Quotation</span>
+    <span>www.nextcall.online</span>
+  </div>
+</section>
+
+<div class="page-break"></div>
+
+<!-- ============== PORTAL CREDITS + COMPARISON ============== -->
+<section>
+  <div class="section-head">
+    <span class="bar"></span>
+    <div>
+      <div class="idx">SECTION 03</div>
+      <h2>NextCall Portal Charges (All Routes)</h2>
+    </div>
+  </div>
+
+  <p>Regardless of the telephony route, AI agent usage is billed by NextCall in <strong>credits</strong>.
+  <strong>Credits = talk minutes</strong> — each minute the AI is on a call consumes credits. Your plan
+  includes a monthly allowance; top-ups are available anytime from the dashboard.</p>
+
+  <table class="avoid-break">
+    <thead><tr><th>NextCall plan</th><th class="num">Included minutes / mo</th><th class="num">Monthly</th><th class="num">Extra minute rate</th></tr></thead>
+    <tbody>
+      <tr><td>Starter</td><td class="num">100 minutes</td><td class="num">PKR 25,000</td><td class="num">PKR 250 / min</td></tr>
+      <tr><td>Growth</td><td class="num">250 minutes</td><td class="num">PKR 45,000</td><td class="num">PKR 180 / min</td></tr>
+      <tr><td>Pro / Enterprise</td><td class="num">Custom</td><td class="num">Custom</td><td class="num">Custom</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Included minutes are AI talk minutes per month. Additional usage beyond the plan is billed
+  at the extra-minute rate shown. With BYO SIP (Routes 1 &amp; 3) there is no extra telephony transport fee
+  on our side. Full plan details are on the Payment &amp; Pricing page.</p>
+
+  <div class="section-head" style="margin-top:18px">
+    <span class="bar"></span>
+    <div>
+      <div class="idx">SECTION 04</div>
+      <h2>Side-by-Side Comparison</h2>
+    </div>
+  </div>
+
+  <table class="cmp avoid-break">
+    <thead>
+      <tr><th>Criteria</th><th>Route 1 — SIM Gateway</th><th>Route 2 — Twilio Forwarding</th><th>Route 3 — Local SIP</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Keeps existing Jazz number</td><td class="yes">Yes</td><td>Yes (via forwarding)</td><td class="no">New number</td></tr>
+      <tr><td>Real local +92 number</td><td class="yes">Yes</td><td class="no">No (foreign)</td><td class="yes">Yes</td></tr>
+      <tr><td>Upfront cost</td><td>Device (one-time)</td><td>None</td><td>Setup (one-time)</td></tr>
+      <tr><td>Recurring cost</td><td>Jazz airtime</td><td>Rental + intl forwarding</td><td>SIP trunk + DID</td></tr>
+      <tr><td>Per-minute telephony</td><td>Low (local)</td><td class="no">High (intl)</td><td>Low (domestic)</td></tr>
+      <tr><td>Hardware needed</td><td>Yes</td><td>No</td><td>No</td></tr>
+      <tr><td>Setup speed</td><td>Medium</td><td class="yes">Fast</td><td>Medium</td></tr>
+      <tr><td>NextCall credits</td><td>Same</td><td>Same</td><td>Same</td></tr>
+    </tbody>
+  </table>
+
+  <div class="reco avoid-break">
+    <p style="margin-bottom:6px"><b>Our recommendation</b></p>
+    <p style="margin-bottom:4px">&bull; <b>Must keep the current Jazz number</b> &rarr; Route 1 (SIM Gateway).</p>
+    <p style="margin-bottom:4px">&bull; <b>Fastest pilot / global callers</b> &rarr; Route 2 (Twilio), accepting higher per-minute cost.</p>
+    <p style="margin-bottom:0">&bull; <b>Best long-term, cost-effective for Pakistan</b> &rarr; Route 3 (Local SIP via Nayatel / PTCL).</p>
+  </div>
+
+  <div class="footer-line">
+    <span>NextCall — Number Connectivity &amp; AI Voice Agent Quotation</span>
+    <span>www.nextcall.online</span>
+  </div>
+</section>
+
+<div class="page-break"></div>
+
+<!-- ============== PAYMENT & PRICING ============== -->
+<section>
+  <div class="section-head">
+    <span class="bar"></span>
+    <div>
+      <div class="idx">SECTION 05</div>
+      <h2>Payment &amp; Pricing Plans</h2>
+    </div>
+  </div>
+
+  <p>Choose a NextCall subscription plan below. Plans are billed <strong>monthly, in advance</strong>, and
+  apply on top of your chosen telephony route (device / number / SIP trunk). Each plan includes AI talk
+  minutes; usage beyond the plan is charged at the extra-minute rate.</p>
+
+  <div class="plans avoid-break">
+    <div class="plan-card s">
+      <div class="ph"><div class="name">STARTER</div><div class="mins">100 minutes / month</div></div>
+      <div class="pb">
+        <div class="price">PKR 25,000</div>
+        <div class="per">per month</div>
+        <ul class="feat">
+          <li>100 AI talk minutes included</li>
+          <li>1 AI voice agent</li>
+          <li>Dashboard &amp; call analytics</li>
+          <li>Call recordings &amp; transcripts</li>
+          <li>Extra minutes: PKR 250 / min</li>
+          <li>Email support</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="plan-card g featured">
+      <div class="ribbon">Popular</div>
+      <div class="ph"><div class="name">GROWTH</div><div class="mins">250 minutes / month</div></div>
+      <div class="pb">
+        <div class="price">PKR 45,000</div>
+        <div class="per">per month</div>
+        <ul class="feat">
+          <li>250 AI talk minutes included</li>
+          <li>Up to 3 AI voice agents</li>
+          <li>Dashboard &amp; advanced analytics</li>
+          <li>Call recordings &amp; transcripts</li>
+          <li>Extra minutes: PKR 180 / min</li>
+          <li>Priority support</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="plan-card p">
+      <div class="ph"><div class="name">PRO</div><div class="mins">Custom volume</div></div>
+      <div class="pb">
+        <div class="price">Custom</div>
+        <div class="per">tailored to your usage</div>
+        <ul class="feat">
+          <li>Custom included minutes</li>
+          <li>Unlimited AI voice agents</li>
+          <li>Dedicated onboarding &amp; SLA</li>
+          <li>Volume discount on minutes</li>
+          <li>Integrations &amp; custom workflows</li>
+          <li>Dedicated account manager</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="pay-grid avoid-break">
+    <div class="pay-box">
+      <h4>Payment terms</h4>
+      <ul>
+        <li>Subscription billed <strong>monthly in advance</strong>.</li>
+        <li>One-time charges (device / setup) are payable before provisioning.</li>
+        <li>Top-up minutes billed at the plan’s extra-minute rate.</li>
+        <li>Telephony charges (Twilio / SIP / SIM) billed as per usage.</li>
+        <li>Prices exclusive of applicable taxes.</li>
+      </ul>
+    </div>
+    <div class="pay-box">
+      <h4>Accepted payment methods</h4>
+      <ul>
+        <li>Bank transfer (IBFT / online banking).</li>
+        <li>Debit / credit card.</li>
+        <li>JazzCash / Easypaisa (on request).</li>
+        <li>International: card or wire (for USD charges).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="ct">Note on Twilio (Route 2)</span>
+    Twilio international number rental is <strong>USD 30 / month</strong> and calls are charged at
+    <strong>USD 0.85 / minute</strong>, billed separately from your NextCall plan. Local routes (1 &amp; 3)
+    avoid these international charges.
+  </div>
+
+  <div class="footer-line">
+    <span>NextCall — Number Connectivity &amp; AI Voice Agent Quotation</span>
+    <span>info@nextcall.online</span>
+  </div>
+</section>
+
+<div class="page-break"></div>
+
+<!-- ============== QUOTATION ============== -->
+<section>
+  <div class="section-head">
+    <span class="bar"></span>
+    <div>
+      <div class="idx">SECTION 06</div>
+      <h2>Itemised Quotation</h2>
+    </div>
+  </div>
+
+  <p class="note" style="margin-bottom:12px">Select one route below. One-time and monthly totals are shown
+  separately. NextCall portal credits apply to every route. Figures marked “quote” are confirmed with the
+  supplier at ordering. Currency mixed as billed (PKR local hardware, USD cloud/AI).</p>
+
+  <h3 style="margin-top:6px">Option A — SIM Gateway (keep your number)</h3>
+  <table class="avoid-break">
+    <thead><tr><th>Item</th><th>Qty</th><th>Type</th><th class="num">Unit</th><th class="num">Amount</th></tr></thead>
+    <tbody>
+      <tr><td>1‑SIM VoLTE gateway device</td><td>1</td><td>One-time</td><td class="num">[PKR ____]</td><td class="num">[PKR ____]</td></tr>
+      <tr><td>Device configuration &amp; onboarding (NextCall)</td><td>1</td><td>One-time</td><td class="num">[____]</td><td class="num">[____]</td></tr>
+      <tr><td>Jazz Business SIM + minutes bundle</td><td>1</td><td>Monthly</td><td class="num">[PKR ____]</td><td class="num">[PKR ____]</td></tr>
+      <tr><td>NextCall plan (Starter / Growth)</td><td>1</td><td>Monthly</td><td class="num">PKR 25,000 / 45,000</td><td class="num">[____]</td></tr>
+      <tr class="total-row"><td colspan="4">One-time total</td><td class="num">[PKR ____]</td></tr>
+      <tr class="total-row"><td colspan="4">Monthly total</td><td class="num">[____]</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:14px">Option B — Twilio Forwarding (fast pilot)</h3>
+  <table class="avoid-break">
+    <thead><tr><th>Item</th><th>Qty</th><th>Type</th><th class="num">Unit</th><th class="num">Amount</th></tr></thead>
+    <tbody>
+      <tr><td>Twilio international number rental</td><td>1</td><td>Monthly</td><td class="num">USD 30 / mo</td><td class="num">USD 30</td></tr>
+      <tr><td>Estimated call minutes @ USD 0.85/min</td><td>[____]</td><td>Monthly</td><td class="num">USD 0.85 / min</td><td class="num">[USD ____]</td></tr>
+      <tr><td>Setup &amp; forwarding configuration (NextCall)</td><td>1</td><td>One-time</td><td class="num">[____]</td><td class="num">[____]</td></tr>
+      <tr><td>NextCall plan (Starter / Growth)</td><td>1</td><td>Monthly</td><td class="num">PKR 25,000 / 45,000</td><td class="num">[____]</td></tr>
+      <tr class="total-row"><td colspan="4">One-time total</td><td class="num">[____]</td></tr>
+      <tr class="total-row"><td colspan="4">Monthly total (est.)</td><td class="num">USD 30 + usage + plan</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:14px">Option C — Local SIP via Nayatel / PTCL (recommended)</h3>
+  <table class="avoid-break">
+    <thead><tr><th>Item</th><th>Qty</th><th>Type</th><th class="num">Unit</th><th class="num">Amount</th></tr></thead>
+    <tbody>
+      <tr><td>SIP trunk (channels)</td><td>[____]</td><td>Monthly</td><td class="num">[PKR ____]</td><td class="num">[PKR ____]</td></tr>
+      <tr><td>Local DID number(s)</td><td>[____]</td><td>Monthly</td><td class="num">[PKR ____]</td><td class="num">[PKR ____]</td></tr>
+      <tr><td>Carrier setup / installation</td><td>1</td><td>One-time</td><td class="num">[PKR ____]</td><td class="num">[PKR ____]</td></tr>
+      <tr><td>NextCall integration &amp; onboarding</td><td>1</td><td>One-time</td><td class="num">[____]</td><td class="num">[____]</td></tr>
+      <tr><td>NextCall plan (Starter / Growth)</td><td>1</td><td>Monthly</td><td class="num">PKR 25,000 / 45,000</td><td class="num">[____]</td></tr>
+      <tr class="total-row"><td colspan="4">One-time total</td><td class="num">[PKR ____]</td></tr>
+      <tr class="total-row"><td colspan="4">Monthly total</td><td class="num">[PKR ____]</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-head" style="margin-top:16px">
+    <span class="bar"></span>
+    <div>
+      <div class="idx">SECTION 07</div>
+      <h2>Terms &amp; Next Step</h2>
+    </div>
+  </div>
+  <ul style="margin:0 0 10px; padding-left:18px; color:var(--slate); font-size:11.5px">
+    <li>Prices are indicative (2026) and subject to final supplier quotes, taxes, and USD/PKR exchange rate.</li>
+    <li>Carrier (Nayatel/PTCL) SIP &amp; setup figures are confirmed via their quotation.</li>
+    <li>Twilio and AI usage are billed in USD; local hardware/SIP in PKR.</li>
+    <li>NextCall portal credits are billed monthly; top-ups available on demand.</li>
+    <li>This quotation is valid for 30 days from the date on the cover.</li>
+  </ul>
+
+  <div class="callout">
+    <span class="ct">Next step</span>
+    Tell us your expected monthly call minutes and whether keeping the current number is mandatory, and we’ll
+    return a finalised quote with exact figures within 1 business day.
+  </div>
+
+  <div class="footer-line">
+    <span>NextCall &middot; info@nextcall.online &middot; www.nextcall.online</span>
+    <span>www.nextcall.online</span>
+  </div>
+</section>
+
+</body>
+</html>

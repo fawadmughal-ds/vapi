@@ -131,7 +131,7 @@ export default function BillingPage() {
                     remaining
                   </span>
                   {sub.topup_credits > 0 && (
-                    <span className="text-emerald-400">
+                    <span className="text-success">
                       +{formatNumber(Math.round(sub.topup_credits))} top-up credits
                     </span>
                   )}
@@ -241,7 +241,7 @@ export default function BillingPage() {
                   <ul className="flex-1 space-y-2.5">
                     {plan.features.slice(0, 6).map((f) => (
                       <li key={f} className="flex items-start gap-2 text-sm">
-                        <Check className="mt-0.5 size-4 shrink-0 text-emerald-400" />
+                        <Check className="mt-0.5 size-4 shrink-0 text-success" />
                         {f}
                       </li>
                     ))}

@@ -48,8 +48,8 @@ export default function SolutionsPage() {
                     </li>
                   ))}
                 </ol>
-                <div className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2">
-                  <p className="text-xs font-medium text-emerald-400">Outcome</p>
+                <div className="mt-4 rounded-lg border border-success/20 bg-success/5 px-3 py-2">
+                  <p className="text-xs font-medium text-success">Outcome</p>
                   <p className="mt-0.5 text-sm">{uc.outcome}</p>
                 </div>
               </div>

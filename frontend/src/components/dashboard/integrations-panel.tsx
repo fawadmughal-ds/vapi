@@ -155,7 +155,7 @@ export function IntegrationsPanel() {
                 onClick={() => openProvider(p)}
                 className={cn(
                   "group flex flex-col items-start gap-2 rounded-xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/60 hover:bg-accent/40",
-                  p.connected && "border-emerald-500/40"
+                  p.connected && "border-success/40"
                 )}
               >
                 <div className="flex w-full items-center justify-between">

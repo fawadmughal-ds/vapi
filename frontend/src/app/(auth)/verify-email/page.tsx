@@ -31,7 +31,7 @@ function LinkVerify({ token }: { token: string }) {
     <div className="text-center">
       {state === "ok" ? (
         <>
-          <CheckCircle2 className="mx-auto size-12 text-emerald-400" />
+          <CheckCircle2 className="mx-auto size-12 text-success" />
           <h1 className="mt-4 text-2xl font-semibold">Email verified</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Your account is now fully active.
@@ -99,7 +99,7 @@ function OtpVerify({ email }: { email: string }) {
   if (verified) {
     return (
       <div className="text-center">
-        <CheckCircle2 className="mx-auto size-12 text-emerald-400" />
+        <CheckCircle2 className="mx-auto size-12 text-success" />
         <h1 className="mt-4 text-2xl font-semibold">Email verified</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Taking you to your workspace…
@@ -110,7 +110,7 @@ function OtpVerify({ email }: { email: string }) {
 
   return (
     <div className="text-center">
-      <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-violet-500/10 ring-1 ring-primary/20">
+      <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-transparent ring-1 ring-primary/20">
         <MailCheck className="size-7 text-primary" />
       </div>
       <h1 className="mt-5 text-2xl font-semibold tracking-tight">Verify your email</h1>

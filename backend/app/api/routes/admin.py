@@ -785,7 +785,10 @@ def update_plan(
         for key, value in data.items():
             setattr(override, key, value)
     else:
-        override = PlanOverride(tier=tier, published=True, **data)
+        # ``data`` may already include ``published`` (sent by the editor), so we
+        # must not also pass it explicitly or we'd hit a duplicate-keyword error.
+        # The model defaults ``published`` to True when it isn't provided.
+        override = PlanOverride(tier=tier, **data)
         db.add(override)
     db.commit()
     db.refresh(override)

@@ -45,7 +45,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       <div className="saas-shell-bg flex h-screen flex-col overflow-hidden">
         <ImpersonationBanner />
         <div className="flex flex-1 items-center justify-center p-6">
-          <div className="glass-panel max-w-md rounded-2xl p-8 text-center shadow-xl">
+          <div className="glass-panel max-w-md p-8 text-center shadow-xl">
             <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-destructive/10 ring-1 ring-destructive/20">
               <Ban className="size-7 text-destructive" />
             </div>
@@ -68,10 +68,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="saas-shell-bg flex h-screen overflow-hidden">
-      <div className="pointer-events-none fixed inset-0 -z-0 overflow-hidden">
-        <div className="absolute -left-48 -top-44 size-[34rem] rounded-full bg-primary/[0.07] blur-[120px] animate-aurora" />
-        <div className="absolute -right-44 top-1/3 size-[28rem] rounded-full bg-violet-500/[0.07] blur-[110px] animate-aurora" />
-      </div>
       <div className="hidden lg:block">
         <Sidebar />
       </div>
@@ -79,7 +75,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-foreground/25 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
           <div className="absolute left-0 top-0 h-full shadow-2xl">

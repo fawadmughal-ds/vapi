@@ -88,7 +88,7 @@ export default function PricingPage() {
         </div>
 
         {/* Enterprise CTA */}
-        <div className="mt-16 glass-card border-violet-500/20 bg-violet-500/5 p-8 text-center">
+        <div className="mt-16 glass-card border-border bg-muted/40 p-8 text-center">
           <h2 className="text-xl font-semibold">Need Enterprise?</h2>
           <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
             Custom limits, SSO, dedicated support, compliance packages, and
