@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -83,6 +85,7 @@ from app.services.voice import voice_provider
 from app.services import vapi_sync
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+logger = logging.getLogger("voxa.admin")
 
 
 @router.get("/stats", response_model=PlatformStats)
@@ -779,19 +782,24 @@ def update_plan(
     admin: User = Depends(require_super_admin),
     db: Session = Depends(get_db),
 ):
-    override = db.get(PlanOverride, tier)
     data = payload.model_dump(exclude_none=True)
-    if override:
-        for key, value in data.items():
-            setattr(override, key, value)
-    else:
-        # ``data`` may already include ``published`` (sent by the editor), so we
-        # must not also pass it explicitly or we'd hit a duplicate-keyword error.
-        # The model defaults ``published`` to True when it isn't provided.
-        override = PlanOverride(tier=tier, **data)
-        db.add(override)
-    db.commit()
-    db.refresh(override)
+    try:
+        override = db.get(PlanOverride, tier)
+        if override:
+            for key, value in data.items():
+                setattr(override, key, value)
+        else:
+            # ``data`` may already include ``published`` (sent by the editor), so
+            # we must not also pass it explicitly or we'd hit a duplicate-keyword
+            # error. The model defaults ``published`` to True when not provided.
+            override = PlanOverride(tier=tier, **data)
+            db.add(override)
+        db.commit()
+        db.refresh(override)
+    except Exception as exc:  # noqa: BLE001
+        db.rollback()
+        logger.exception("Failed to update plan %s", tier)
+        raise HTTPException(status_code=500, detail=f"Could not save plan: {exc}") from exc
     record_audit(
         db,
         user_id=admin.id,

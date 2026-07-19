@@ -53,19 +53,23 @@ function mergeApiPlans(
   const plans = store.pricing.plans.map((plan) => {
     const backendTier = plan.backendTier;
     if (!backendTier) return plan;
-    const api = apiPlans.find((p) => p.tier === backendTier);
-    if (!api || !api.published) {
-      if (api && !api.published) return { ...plan, isVisible: false };
-      return plan;
+    // `/billing/plans` returns only PUBLISHED plans, so a plan being present in
+    // the response means it's published; absence means it's hidden. (The
+    // response intentionally omits the `published` flag.)
+    const apiPlan = apiPlans.find((p) => p.tier === backendTier);
+    if (!apiPlan) {
+      return { ...plan, isVisible: false };
     }
     return {
       ...plan,
-      planName: api.name,
-      monthlyPrice: api.price_usd,
-      yearlyPrice: Math.round(api.price_usd * 12 * (1 - store.pricing.yearlyDiscountPercent / 100)),
-      features: api.features.length ? api.features : plan.features,
-      limits: { ...plan.limits, callMinutes: api.minutes },
-      isVisible: api.published,
+      planName: apiPlan.name,
+      monthlyPrice: apiPlan.price_usd,
+      yearlyPrice: Math.round(
+        apiPlan.price_usd * 12 * (1 - store.pricing.yearlyDiscountPercent / 100)
+      ),
+      features: apiPlan.features.length ? apiPlan.features : plan.features,
+      limits: { ...plan.limits, callMinutes: apiPlan.minutes },
+      isVisible: true,
     };
   });
 
