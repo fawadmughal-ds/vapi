@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from sqlalchemy import Boolean, Enum, String
+from sqlalchemy import Boolean, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -27,11 +27,20 @@ class User(UUIDMixin, TimestampMixin, Base):
     is_email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     company_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    stripe_customer_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    # Indexed so the Stripe webhook can resolve a user by customer id quickly.
+    stripe_customer_id: Mapped[Optional[str]] = mapped_column(
+        String(255), index=True, nullable=True
+    )
 
     # Each customer's data lives under their team owner. For simplicity the owner
     # is the user themselves; team members reference their owner via ``parent_id``.
-    parent_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True, index=True)
+    # FK (SET NULL) keeps referential integrity if an owner is deleted.
+    parent_id: Mapped[Optional[str]] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
 
     # Relationships
     agents: Mapped[List["Agent"]] = relationship(  # noqa: F821

@@ -5,6 +5,64 @@ import type { NextConfig } from "next";
 const BACKEND_INTERNAL_URL =
   process.env.BACKEND_INTERNAL_URL || "http://backend:8000";
 
+// Content-Security-Policy. Because access/refresh JWTs live in localStorage,
+// a CSP is the primary defense against token theft via injected scripts: it
+// restricts which origins may load/execute scripts and where the app may
+// connect. Kept reasonably permissive for Next.js (inline styles, GA/GTM, the
+// Vapi web SDK + its media/websocket endpoints) while blocking arbitrary hosts.
+// Next.js dev mode (`next dev`) compiles with eval-based source maps and React
+// dev tooling that require 'unsafe-eval'. Production builds never use eval, so
+// we only relax the policy outside production.
+const isDev = process.env.NODE_ENV !== "production";
+const scriptSrc = [
+  "script-src 'self' 'unsafe-inline'",
+  isDev ? "'unsafe-eval'" : "",
+  "https://www.googletagmanager.com https://www.google-analytics.com",
+]
+  .filter(Boolean)
+  .join(" ");
+
+// The browser talks to the API at NEXT_PUBLIC_API_URL when set (e.g.
+// http://localhost:8000 in Docker dev); otherwise it uses the same origin via
+// the Next.js rewrite. Whitelist that origin for fetch/XHR so CSP allows it.
+function apiOrigin(): string {
+  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (!raw) return "";
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return "";
+  }
+}
+
+const connectSrc = isDev
+  ? // Dev is local-only: allow localhost API/HMR websockets so hot reload and a
+    // cross-port backend both work without fighting CSP.
+    "connect-src 'self' http://localhost:* ws://localhost:* https://api.vapi.ai wss://*.vapi.ai https://*.vapi.ai https://www.google-analytics.com"
+  : [
+      "connect-src 'self'",
+      apiOrigin(),
+      "https://api.vapi.ai wss://*.vapi.ai https://*.vapi.ai https://www.google-analytics.com",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+const csp = [
+  "default-src 'self'",
+  // Next.js injects inline bootstrap scripts; GA/GTM are loaded for analytics.
+  scriptSrc,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: https:",
+  "font-src 'self' data:",
+  // XHR/fetch/websocket: API origin + Vapi + analytics.
+  connectSrc,
+  "media-src 'self' blob: https://*.vapi.ai",
+  "frame-ancestors 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+].join("; ");
+
 const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -14,6 +72,7 @@ const securityHeaders = [
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
+  { key: "Content-Security-Policy", value: csp },
   // Allow same-origin microphone for in-app web calling; block camera/geo.
   {
     key: "Permissions-Policy",

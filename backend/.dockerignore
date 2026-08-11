@@ -1,0 +1,33 @@
+# Keep the build context small and never ship local/dev artifacts or secrets.
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Secrets & local env — must never enter an image layer.
+.env
+.env.*
+!.env.example
+
+# VCS / editor / OS noise
+.git/
+.gitignore
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Local data & logs
+storage/
+*.log
+*.sqlite3
+*.db
+
+# Docs / tests aren't needed at runtime
+tests/
+*.md

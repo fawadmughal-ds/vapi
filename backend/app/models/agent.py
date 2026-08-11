@@ -23,7 +23,10 @@ class Agent(UUIDMixin, TimestampMixin, Base):
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Internal Vapi reference — NEVER exposed in public API responses.
-    vapi_assistant_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    # Indexed: the Vapi webhook resolves the owning agent by this id on every event.
+    vapi_assistant_id: Mapped[Optional[str]] = mapped_column(
+        String(255), index=True, nullable=True
+    )
 
     system_prompt: Mapped[str] = mapped_column(Text, default="", nullable=False)
     first_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

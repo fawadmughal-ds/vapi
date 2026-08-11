@@ -56,6 +56,12 @@ def ensure_runtime_schema() -> None:
         "ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS provider_balance DOUBLE PRECISION NOT NULL DEFAULT 0",
         "ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS provider_balance_at TIMESTAMPTZ",
         "ALTER TABLE platform_settings ADD COLUMN IF NOT EXISTS provider_currency VARCHAR(8) NOT NULL DEFAULT 'USD'",
+        # Hot-path indexes for webhook/billing lookups (create_all won't add
+        # indexes to pre-existing tables). Idempotent via IF NOT EXISTS.
+        "CREATE INDEX IF NOT EXISTS ix_agents_vapi_assistant_id ON agents (vapi_assistant_id)",
+        "CREATE INDEX IF NOT EXISTS ix_users_stripe_customer_id ON users (stripe_customer_id)",
+        "CREATE INDEX IF NOT EXISTS ix_subscriptions_stripe_subscription_id ON subscriptions (stripe_subscription_id)",
+        "CREATE INDEX IF NOT EXISTS ix_calls_user_created ON calls (user_id, created_at)",
     ]
     with engine.begin() as conn:
         for stmt in statements:

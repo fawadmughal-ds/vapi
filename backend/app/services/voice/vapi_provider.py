@@ -84,3 +84,6 @@ class VapiProvider(VoiceProvider):
 
     async def upload_file(self, file_name: str, content: bytes, content_type: str) -> str:
         return await self._client.upload_file(file_name, content, content_type)
+
+    async def list_files(self) -> list[dict[str, Any]]:
+        return await self._client.list_files()

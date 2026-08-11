@@ -1,0 +1,7 @@
+# High-signal linting: pyflakes (unused imports, undefined names) + syntax
+# errors. Stylistic rules are intentionally not enforced to avoid churn.
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = ["F", "E9"]

@@ -47,6 +47,19 @@ function RegisterForm() {
     setLoading(true);
     try {
       await register(form);
+      // Remember a chosen paid plan so billing can resume checkout after the
+      // account is verified (the API grants a trial on signup; payment happens
+      // via Stripe checkout). Trial/free selections need no follow-up.
+      const chosen = selectablePlans.find((p) => p.planId === selectedPlan);
+      try {
+        if (chosen?.backendTier && chosen.monthlyPrice > 0) {
+          localStorage.setItem("nextcall_intended_plan", chosen.backendTier);
+        } else {
+          localStorage.removeItem("nextcall_intended_plan");
+        }
+      } catch {
+        /* localStorage unavailable — non-fatal */
+      }
       toast.success("Workspace created! We sent a 6-digit code to your email.");
       router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
     } catch (err) {

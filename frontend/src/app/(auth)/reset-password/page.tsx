@@ -16,12 +16,25 @@ function ResetForm() {
   const router = useRouter();
   const token = params.get("token") || "";
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+
+  function passwordIssue(pw: string): string | null {
+    if (pw.length < 8) return "Password must be at least 8 characters";
+    if (!/[A-Za-z]/.test(pw) || !/\d/.test(pw))
+      return "Use at least one letter and one number";
+    return null;
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters");
+    const issue = passwordIssue(password);
+    if (issue) {
+      toast.error(issue);
+      return;
+    }
+    if (password !== confirm) {
+      toast.error("Passwords don't match");
       return;
     }
     setLoading(true);
@@ -72,6 +85,22 @@ function ResetForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <p className="text-xs text-muted-foreground">
+            At least 8 characters, including a letter and a number.
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirm">Confirm new password</Label>
+          <Input
+            id="confirm"
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            required
+          />
+          {confirm.length > 0 && confirm !== password && (
+            <p className="text-xs text-destructive">Passwords don&apos;t match</p>
+          )}
         </div>
         <Button type="submit" className="w-full" disabled={loading}>
           {loading && <Spinner />} Reset password

@@ -21,6 +21,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   Dialog,
   DialogDescription,
@@ -58,6 +59,7 @@ type Tab = "assistant" | "logs" | "analysis" | "advanced";
 export default function AgentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const confirm = useConfirm();
   const { outOfCredits } = useSubscription();
   const { data: agent, loading, error, setData } = useApi<Agent>(`/agents/${id}`, [id]);
   const [voices, setVoices] = useState<VoiceOption[]>([]);
@@ -213,7 +215,15 @@ export default function AgentDetailPage() {
   }
 
   async function remove() {
-    if (!confirm("Delete this agent? This cannot be undone.")) return;
+    if (
+      !(await confirm({
+        title: "Delete agent?",
+        description: "This agent will be permanently deleted. This cannot be undone.",
+        confirmLabel: "Delete",
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await api.delete(`/agents/${id}`);
       toast.success("Agent deleted");

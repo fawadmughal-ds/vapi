@@ -434,6 +434,17 @@ def _template(
     bulletproof CTA button when ``cta_link`` is given. Optionally shows a
     ``highlight`` amount box and a ``details`` key/value summary table.
     """
+    # Only allow http(s) CTA links — never javascript:/data: URLs, which could
+    # be crafted if a link value ever originates from untrusted input.
+    if cta_link and not cta_link.lower().startswith(("http://", "https://")):
+        cta_link = ""
+    # Escape the key/value summary table — these rows frequently carry
+    # user-supplied values (contact name/email, company, etc.).
+    if details:
+        details = [(html_escape(str(k)), html_escape(str(v))) for k, v in details]
+    if highlight:
+        highlight = (html_escape(str(highlight[0])), html_escape(str(highlight[1])))
+
     highlight_html = ""
     if highlight:
         h_label, h_value = highlight

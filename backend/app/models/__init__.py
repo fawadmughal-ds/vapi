@@ -19,3 +19,4 @@ from app.models.plan_override import PlanOverride  # noqa: F401
 from app.models.platform_settings import PlatformSettings  # noqa: F401
 from app.models.tenant_integration import TenantIntegrationEntitlement  # noqa: F401
 from app.models.squad import Squad  # noqa: F401
+from app.models.campaign import Campaign, CampaignContact  # noqa: F401

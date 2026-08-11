@@ -33,6 +33,12 @@ const MAP: Record<string, BadgeProps["variant"]> = {
   ready: "success",
   processing: "warning",
   uploading: "secondary",
+  // campaigns
+  running: "default",
+  paused: "warning",
+  // campaign contacts
+  called: "success",
+  calling: "default",
 };
 
 const DOT: Record<NonNullable<BadgeProps["variant"]>, string> = {

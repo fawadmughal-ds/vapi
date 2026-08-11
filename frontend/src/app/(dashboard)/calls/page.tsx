@@ -39,6 +39,7 @@ export default function CallsPage() {
   const [direction, setDirection] = useState("");
   const [data, setData] = useState<Page<Call> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Call | null>(null);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function CallsPage() {
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     const params = new URLSearchParams({
       page: String(page),
       page_size: "15",
@@ -58,7 +60,9 @@ export default function CallsPage() {
     api
       .get<Page<Call>>(`/calls?${params.toString()}`)
       .then(setData)
-      .catch(() => {})
+      .catch((err) =>
+        setError(err instanceof Error ? err.message : "Failed to load calls")
+      )
       .finally(() => setLoading(false));
   }, [page, debounced, status, direction]);
 
@@ -118,6 +122,13 @@ export default function CallsPage() {
                 <Skeleton key={i} className="h-10 w-full" />
               ))}
             </div>
+          ) : error ? (
+            <EmptyState
+              icon={PhoneCall}
+              title="Couldn't load calls"
+              description={error}
+              className="border-0"
+            />
           ) : !data || data.items.length === 0 ? (
             <EmptyState
               icon={PhoneCall}

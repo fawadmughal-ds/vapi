@@ -119,3 +119,10 @@ class VoiceProvider(abc.ABC):
     @abc.abstractmethod
     async def upload_file(self, file_name: str, content: bytes, content_type: str) -> str:
         """Upload a knowledge-base file upstream; return its file id."""
+
+    async def list_files(self) -> list[dict[str, Any]]:
+        """Return knowledge-base files that exist upstream (for import/sync).
+
+        Optional capability — providers without file listing return an empty list.
+        """
+        return []

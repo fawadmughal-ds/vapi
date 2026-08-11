@@ -47,6 +47,7 @@ export function TopNav({ onMenu }: { onMenu: () => void }) {
         size="icon"
         className="lg:hidden"
         onClick={onMenu}
+        aria-label="Open navigation menu"
       >
         <Menu className="size-5" />
       </Button>
@@ -96,7 +97,12 @@ export function TopNav({ onMenu }: { onMenu: () => void }) {
           </div>
         )}
 
-        <Button variant="ghost" size="icon" className="relative size-9">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative size-9"
+          aria-label="Notifications"
+        >
           <Bell className="size-[18px]" />
           <span className="absolute right-2 top-2 size-1.5 rounded-full bg-primary ring-2 ring-background animate-pulse-signal" />
         </Button>
@@ -104,6 +110,9 @@ export function TopNav({ onMenu }: { onMenu: () => void }) {
         <div className="relative" ref={ref}>
           <button
             onClick={() => setOpen((o) => !o)}
+            aria-label="Account menu"
+            aria-haspopup="menu"
+            aria-expanded={open}
             className="flex items-center gap-2 rounded-chamfer border border-transparent py-1 pl-1 pr-2 transition-all duration-200 hover:bg-muted"
           >
             <span className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">

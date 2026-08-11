@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode, useEffect, useState } from "react";
-import { Info, Phone, Plus, Trash2 } from "lucide-react";
+import { Info, Phone, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { EmptyState } from "@/components/shared/empty-state";
@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   Dialog,
   DialogDescription,
@@ -60,6 +61,7 @@ const EMPTY_FORM = {
 };
 
 export default function PhoneNumbersPage() {
+  const confirm = useConfirm();
   const { data: numbers, loading, reload } = useApi<PhoneNumber[]>(
     "/phone-numbers"
   );
@@ -68,6 +70,7 @@ export default function PhoneNumbersPage() {
   const [method, setMethod] = useState<Method>("vapi_number");
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     api.get<Agent[]>("/agents").then(setAgents).catch(() => {});
@@ -80,7 +83,30 @@ export default function PhoneNumbersPage() {
   }
 
   function setField(key: keyof typeof EMPTY_FORM, value: string) {
+    if (key === "area_code") {
+      value = value.replace(/\D/g, "").slice(0, 3);
+    }
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  async function syncNumbers() {
+    setSyncing(true);
+    try {
+      const synced = await api.post<PhoneNumber[]>("/phone-numbers/sync");
+      const imported = synced.length - (numbers?.length ?? 0);
+      toast.success(
+        imported > 0
+          ? `Imported ${imported} number${imported === 1 ? "" : "s"} from provider`
+          : synced.length > 0
+            ? "Phone numbers are already up to date"
+            : "No numbers found in your provider account"
+      );
+      reload();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to sync numbers");
+    } finally {
+      setSyncing(false);
+    }
   }
 
   async function add() {
@@ -103,7 +129,7 @@ export default function PhoneNumbersPage() {
   }
 
   const canSubmit = (() => {
-    if (method === "vapi_number") return !!form.area_code;
+    if (method === "vapi_number") return /^\d{3}$/.test(form.area_code);
     if (method === "vapi_sip") return !!form.sip_uri;
     if (method === "twilio") return !!form.e164_number;
     if (method === "vonage" || method === "telnyx")
@@ -125,7 +151,15 @@ export default function PhoneNumbersPage() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Remove this phone number?")) return;
+    if (
+      !(await confirm({
+        title: "Remove phone number?",
+        description: "This number will be detached from your workspace.",
+        confirmLabel: "Remove",
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await api.delete(`/phone-numbers/${id}`);
       toast.success("Number removed");
@@ -146,9 +180,15 @@ export default function PhoneNumbersPage() {
           { label: "Numbers" },
         ]}
         action={
-          <Button onClick={openDialog}>
-            <Plus className="size-4" /> Add Number
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={syncNumbers} disabled={syncing}>
+              <RefreshCw className={cn("size-4", syncing && "animate-spin")} />{" "}
+              Sync from provider
+            </Button>
+            <Button onClick={openDialog}>
+              <Plus className="size-4" /> Add Number
+            </Button>
+          </div>
         }
       />
 
@@ -164,8 +204,19 @@ export default function PhoneNumbersPage() {
             <EmptyState
               icon={Phone}
               title="No phone numbers"
-              description="Add a number to route calls to your agents."
+              description="Sync numbers already in your provider account, or add a new one to route calls to your agents."
               className="border-0"
+              action={
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button onClick={syncNumbers} disabled={syncing}>
+                    <RefreshCw className={cn("size-4", syncing && "animate-spin")} />{" "}
+                    Sync from provider
+                  </Button>
+                  <Button variant="outline" onClick={openDialog}>
+                    <Plus className="size-4" /> Add number
+                  </Button>
+                </div>
+              }
             />
           ) : (
             <Table>
@@ -264,7 +315,9 @@ export default function PhoneNumbersPage() {
               <>
                 <Field label="Area Code">
                   <Input
-                    placeholder="e.g. 346, 984, 326"
+                    placeholder="e.g. 831"
+                    inputMode="numeric"
+                    maxLength={3}
                     value={form.area_code}
                     onChange={(e) => setField("area_code", e.target.value)}
                   />
@@ -273,9 +326,15 @@ export default function PhoneNumbersPage() {
                   <span className="font-medium text-foreground">
                     Free US phone numbers
                   </span>{" "}
-                  · up to 10 per account. Only US area codes are supported. For
-                  international or production numbers, import a Twilio/Vonage/Telnyx
-                  number instead.
+                  · up to 10 per account. Enter a 3-digit US area code. If you
+                  already created numbers in the provider dashboard, use{" "}
+                  <span className="font-medium text-foreground">
+                    Sync from provider
+                  </span>{" "}
+                  instead. Creating additional numbers may require a payment
+                  method on file with the provider (you are not charged for free
+                  numbers). For international numbers, import Twilio/Vonage/Telnyx
+                  instead.
                 </Note>
               </>
             )}

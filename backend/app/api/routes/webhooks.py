@@ -7,6 +7,7 @@ call lifecycle events and billing events.
 
 from __future__ import annotations
 
+import hmac
 import logging
 from datetime import datetime, timezone
 
@@ -19,7 +20,12 @@ from app.models.agent import Agent
 from app.models.call import Call
 from app.models.enums import CallDirection, CallStatus, PlanTier
 from app.models.user import User
-from app.services.billing import activate_plan, record_usage
+from app.services.billing import (
+    activate_plan,
+    cancel_subscription,
+    has_available_quota,
+    record_usage,
+)
 from app.services.email import email_service
 from app.services.functions import execute_function
 from app.services.plans import plan_for_stripe_price
@@ -34,23 +40,18 @@ router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
 
 def _verify_vapi_webhook_secret(x_vapi_secret: str | None) -> None:
-    """Env-aware Vapi webhook auth: strict in production, permissive in dev."""
+    """Verify the Vapi webhook shared secret.
+
+    Fail-closed in ALL environments: an unsigned Vapi webhook can create calls,
+    append transcripts, execute tool functions, and deduct credits, so we never
+    accept one without a configured, matching secret. Uses a constant-time
+    comparison to avoid timing side-channels.
+    """
     secret = settings.VAPI_WEBHOOK_SECRET
-    if settings.is_production:
-        if not secret:
-            logger.error("VAPI_WEBHOOK_SECRET is not configured in production")
-            raise HTTPException(
-                status_code=503, detail="Webhook verification not configured"
-            )
-        if not x_vapi_secret or x_vapi_secret != secret:
-            raise HTTPException(status_code=401, detail="Invalid webhook signature")
-        return
     if not secret:
-        logger.warning(
-            "VAPI_WEBHOOK_SECRET is not set — accepting unsigned Vapi webhooks (dev only)"
-        )
-        return
-    if not x_vapi_secret or x_vapi_secret != secret:
+        logger.error("VAPI_WEBHOOK_SECRET is not configured — rejecting webhook")
+        raise HTTPException(status_code=503, detail="Webhook verification not configured")
+    if not x_vapi_secret or not hmac.compare_digest(x_vapi_secret, secret):
         raise HTTPException(status_code=401, detail="Invalid webhook signature")
 
 
@@ -152,6 +153,13 @@ async def vapi_webhook(
 def _handle_tool_calls(db: Session, message: dict) -> dict:
     call = _ensure_call(db, message)
     if not call:
+        return {"results": []}
+
+    # Admission control: never execute billable tool functions for a tenant that
+    # has no remaining quota (this also covers inbound calls, which have no
+    # pre-call check elsewhere).
+    if not has_available_quota(db, call.user_id):
+        logger.warning("Skipping tool calls for out-of-quota tenant %s", call.user_id)
         return {"results": []}
 
     # Support both legacy "functionCall" and newer "toolCalls" shapes.
@@ -285,11 +293,23 @@ async def stripe_webhook(
         customer_id = data.get("customer")
         user = db.query(User).filter(User.stripe_customer_id == customer_id).first()
         if user:
-            items = data.get("items", {}).get("data", [])
-            price_id = items[0].get("price", {}).get("id") if items else None
-            plan = plan_for_stripe_price(price_id) if price_id else None
-            if plan:
-                activate_plan(db, user.id, plan,
-                              stripe_subscription_id=data.get("id"), stripe_price_id=price_id)
+            # A cancellation scheduled in the portal arrives as an update with a
+            # canceled/unpaid status — treat it as a cancellation.
+            sub_status = (data.get("status") or "").lower()
+            if sub_status in ("canceled", "unpaid", "incomplete_expired"):
+                cancel_subscription(db, user.id)
+            else:
+                items = data.get("items", {}).get("data", [])
+                price_id = items[0].get("price", {}).get("id") if items else None
+                plan = plan_for_stripe_price(price_id) if price_id else None
+                if plan:
+                    activate_plan(db, user.id, plan,
+                                  stripe_subscription_id=data.get("id"), stripe_price_id=price_id)
+
+    elif event_type == "customer.subscription.deleted":
+        customer_id = data.get("customer")
+        user = db.query(User).filter(User.stripe_customer_id == customer_id).first()
+        if user:
+            cancel_subscription(db, user.id)
 
     return {"received": True}

@@ -400,6 +400,45 @@ export interface AgentTool {
   updated_at: string;
 }
 
+export type CampaignStatus = "draft" | "running" | "completed" | "paused";
+export type ContactStatus = "pending" | "calling" | "called" | "failed";
+
+export interface Campaign {
+  id: string;
+  user_id: string;
+  agent_id: string;
+  phone_number_id?: string | null;
+  name: string;
+  status: CampaignStatus;
+  agent_name?: string | null;
+  phone_number?: string | null;
+  total_contacts: number;
+  called_contacts: number;
+  pending_contacts: number;
+  failed_contacts: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CampaignContact {
+  id: string;
+  campaign_id: string;
+  name?: string | null;
+  phone: string;
+  status: ContactStatus;
+  call_id?: string | null;
+  error?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CampaignLaunchResult {
+  queued: number;
+  failed: number;
+  skipped: number;
+  detail: string;
+}
+
 export interface SquadMember {
   agent_id: string;
   agent_name?: string | null;

@@ -46,26 +46,51 @@ def platform_has_capacity(db: Session) -> bool:
 
 
 def consume_credits(db: Session, sub: Subscription, credits: float) -> None:
-    """Deduct credits from a tenant (allowance first, then top-up) and the pool."""
+    """Deduct credits from a tenant (allowance first, then top-up) and the pool.
+
+    Concurrency-safe: the tenant subscription row and the platform-settings row
+    are locked with ``SELECT ... FOR UPDATE`` before the read-modify-write, so
+    simultaneous end-of-call deductions serialize instead of clobbering each
+    other (which previously allowed lost updates / silent overspend). On engines
+    without row locking (e.g. SQLite in tests) ``with_for_update`` is a no-op.
+    """
     if credits <= 0:
         return
 
+    # Re-load the subscription under a row lock so the deduction is atomic.
+    locked_sub = (
+        db.query(Subscription)
+        .filter(Subscription.id == sub.id)
+        .with_for_update()
+        .first()
+    ) or sub
+
     # 1) Spend the monthly allowance, then 2) dip into the top-up wallet.
-    period_remaining = max(sub.credit_limit - sub.credits_used, 0.0)
+    period_remaining = max(locked_sub.credit_limit - locked_sub.credits_used, 0.0)
     from_period = min(credits, period_remaining)
-    sub.credits_used = (sub.credits_used or 0.0) + from_period
+    locked_sub.credits_used = (locked_sub.credits_used or 0.0) + from_period
     leftover = credits - from_period
     if leftover > 0:
-        sub.topup_credits = max((sub.topup_credits or 0.0) - leftover, 0.0)
+        locked_sub.topup_credits = max((locked_sub.topup_credits or 0.0) - leftover, 0.0)
 
     # Mirror into the legacy minute counter for backward-compatible reporting.
-    sub.minutes_used = (sub.minutes_used or 0.0) + credits_to_minutes(db, credits)
+    locked_sub.minutes_used = (locked_sub.minutes_used or 0.0) + credits_to_minutes(db, credits)
 
-    # Draw down the global pool.
-    settings_row = get_platform_settings(db)
+    # Draw down the global pool under a lock too.
+    settings_row = (
+        db.query(PlatformSettings)
+        .filter(PlatformSettings.id == SINGLETON_ID)
+        .with_for_update()
+        .first()
+    )
+    if settings_row is None:
+        settings_row = get_platform_settings(db)
     settings_row.credits_used = (settings_row.credits_used or 0.0) + credits
 
     db.commit()
+    # Keep the caller's object consistent with the committed state.
+    if locked_sub is not sub:
+        db.refresh(sub)
 
 
 def purchase_credits(db: Session, amount: float) -> PlatformSettings:

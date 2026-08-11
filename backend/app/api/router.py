@@ -9,6 +9,7 @@ from app.api.routes import (
     auth,
     billing,
     calls,
+    campaigns,
     contact,
     integrations,
     knowledge_base,
@@ -29,6 +30,7 @@ api_router.include_router(tools.router)
 api_router.include_router(knowledge_base.router)
 api_router.include_router(phone_numbers.router)
 api_router.include_router(calls.router)
+api_router.include_router(campaigns.router)
 api_router.include_router(squads.router)
 api_router.include_router(analytics.router)
 api_router.include_router(billing.router)

@@ -35,7 +35,7 @@ class PhoneNumberProvision(BaseModel):
     country: Optional[str] = None
 
     # Free Vapi number
-    area_code: Optional[str] = Field(default=None, max_length=10)
+    area_code: Optional[str] = Field(default=None, min_length=3, max_length=3)
     # SIP-based options
     sip_uri: Optional[str] = None
 

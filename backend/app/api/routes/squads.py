@@ -18,6 +18,29 @@ from app.services.voice import voice_provider
 router = APIRouter(prefix="/squads", tags=["squads"])
 
 
+def _validate_member_ids(db: Session, user: User, agent_ids: list[str] | None) -> None:
+    """Reject any agent id that doesn't belong to the caller's tenant.
+
+    Prevents persisting another tenant's agent UUIDs into a squad's metadata.
+    """
+    if not agent_ids:
+        return
+    owned = {
+        a.id
+        for a in db.scalars(
+            select(Agent.id).where(
+                Agent.id.in_(agent_ids), Agent.user_id == tenant_id(user)
+            )
+        ).all()
+    }
+    unknown = [aid for aid in agent_ids if aid not in owned]
+    if unknown:
+        raise HTTPException(
+            status_code=400,
+            detail="One or more agents do not exist in your workspace.",
+        )
+
+
 def _agents_for(db: Session, user: User, agent_ids: list[str]) -> list[Agent]:
     if not agent_ids:
         return []
@@ -59,6 +82,7 @@ def list_squads(user: User = Depends(get_verified_user), db: Session = Depends(g
 @router.post("", response_model=SquadPublic, status_code=201)
 def create_squad(payload: SquadCreate, user: User = Depends(get_verified_user),
                  db: Session = Depends(get_db)):
+    _validate_member_ids(db, user, payload.member_agent_ids)
     squad = Squad(
         user_id=tenant_id(user),
         name=payload.name,
@@ -91,7 +115,10 @@ async def update_squad(squad_id: str, payload: SquadUpdate,
                        user: User = Depends(get_verified_user),
                        db: Session = Depends(get_db)):
     squad = _owned_squad(squad_id, user, db)
-    for field, value in payload.model_dump(exclude_unset=True).items():
+    data = payload.model_dump(exclude_unset=True)
+    if "member_agent_ids" in data:
+        _validate_member_ids(db, user, data["member_agent_ids"])
+    for field, value in data.items():
         setattr(squad, field, value)
     db.commit()
     db.refresh(squad)

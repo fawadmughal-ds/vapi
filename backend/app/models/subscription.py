@@ -43,7 +43,9 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
     # allowance and NOT reset between periods.
     topup_credits: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
 
-    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(
+        String(255), index=True, nullable=True
+    )
     stripe_price_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
     current_period_start: Mapped[Optional[datetime]] = mapped_column(

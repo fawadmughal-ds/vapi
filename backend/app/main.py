@@ -34,13 +34,18 @@ async def lifespan(app: FastAPI):
     yield
 
 
+# Hide interactive API docs & the OpenAPI schema in production to avoid
+# disclosing the full API surface publicly.
+_docs_enabled = not settings.is_production
+
 app = FastAPI(
     title=f"{settings.PROJECT_NAME} API",
     version="1.0.0",
     description="White-label AI voice agent platform API.",
     lifespan=lifespan,
-    docs_url="/docs",
-    openapi_url="/openapi.json",
+    docs_url="/docs" if _docs_enabled else None,
+    redoc_url="/redoc" if _docs_enabled else None,
+    openapi_url="/openapi.json" if _docs_enabled else None,
 )
 
 app.state.limiter = limiter

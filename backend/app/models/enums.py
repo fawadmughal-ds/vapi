@@ -66,3 +66,17 @@ class PhoneNumberStatus(str, enum.Enum):
     AVAILABLE = "available"
     ASSIGNED = "assigned"
     RELEASED = "released"
+
+
+class CampaignStatus(str, enum.Enum):
+    DRAFT = "draft"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    PAUSED = "paused"
+
+
+class ContactStatus(str, enum.Enum):
+    PENDING = "pending"
+    CALLING = "calling"
+    CALLED = "called"
+    FAILED = "failed"

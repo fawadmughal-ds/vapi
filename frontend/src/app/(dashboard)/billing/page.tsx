@@ -40,6 +40,26 @@ export default function BillingPage() {
     }
   }, [reload]);
 
+  // Resume a paid plan the user selected at sign-up (stored during registration).
+  useEffect(() => {
+    if (!sub) return;
+    let intended: string | null = null;
+    try {
+      intended = localStorage.getItem("nextcall_intended_plan");
+    } catch {
+      intended = null;
+    }
+    if (intended && intended !== sub.plan) {
+      try {
+        localStorage.removeItem("nextcall_intended_plan");
+      } catch {
+        /* ignore */
+      }
+      toast.info("Finish setting up the plan you chose at sign-up.");
+      subscribe(intended as PlanTier);
+    }
+  }, [sub]);
+
   async function subscribe(plan: PlanTier) {
     setCheckingOut(plan);
     try {

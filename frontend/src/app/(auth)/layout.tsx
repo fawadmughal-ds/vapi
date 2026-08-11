@@ -29,7 +29,14 @@ export default function AuthLayout({
         </p>
       </div>
       <div className="relative hidden overflow-hidden border-l border-border/50 lg:block">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-background to-transparent" />
+        <div className="hero-grid-bg absolute inset-0" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.08] via-background to-transparent" />
+        <div className="absolute -right-20 -top-20 grid size-96 place-items-center">
+          <div className="orb-ring size-44" />
+          <div className="orb-ring size-44 [animation-delay:-1.2s]" />
+          <div className="orb-ring size-44 [animation-delay:-2.4s]" />
+          <div className="voice-orb absolute size-44" />
+        </div>
         <div className="relative flex h-full flex-col justify-center px-14 xl:px-20">
           <p className="mb-6 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
             AI Voice Operating System

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timedelta, timezone
+from html import escape as html_escape
 from typing import Any, Optional
 
 from sqlalchemy import func, select
@@ -116,11 +117,15 @@ def _send_email(db: Session, user_id: str, agent_id: Optional[str],
     to = args.get("to") or args.get("email")
     if not to:
         return {"success": False, "message": "No recipient email provided."}
+    # Escape the model/caller-supplied body — it is untrusted and must not be
+    # able to inject arbitrary HTML/markup into the outbound email.
+    body = str(args.get("body", ""))
+    safe_body = html_escape(body).replace("\n", "<br>")
     email_service.send(
         to=to,
-        subject=args.get("subject", "Message from your AI assistant"),
-        html=f"<p>{args.get('body', '')}</p>",
-        text=args.get("body", ""),
+        subject=str(args.get("subject", "Message from your AI assistant")),
+        html=f"<p>{safe_body}</p>",
+        text=body,
     )
     record_audit(
         db,
@@ -170,6 +175,7 @@ def execute_function(
         return {"success": False, "message": f"Unknown function '{name}'."}
     try:
         return handler(db, user_id, agent_id, call_id, arguments or {})
-    except Exception as exc:  # noqa: BLE001
+    except Exception:  # noqa: BLE001
+        # Never leak internal exception detail back to the assistant/caller.
         logger.exception("Function %s failed", name)
-        return {"success": False, "message": f"Failed to execute {name}: {exc}"}
+        return {"success": False, "message": f"Could not complete the {name} request."}

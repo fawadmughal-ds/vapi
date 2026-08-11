@@ -83,7 +83,7 @@ export function PricingCards({
               className={cn(
                 "glass-card-hover relative flex flex-col p-6",
                 plan.isPopular && "border-primary/40 glow-sm",
-                plan.isEnterprise && "border-violet-300/60"
+                plan.isEnterprise && "aurora-border"
               )}
             >
               {plan.isPopular && (

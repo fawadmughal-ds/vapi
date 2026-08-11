@@ -441,6 +441,10 @@ def _get_customer(user_id: str, db: Session) -> User:
     user = db.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    # Customer-management actions (suspend, plan, credits, impersonate, …) must
+    # only target customer accounts — never other super-admins.
+    if user.role != UserRole.CUSTOMER:
+        raise HTTPException(status_code=404, detail="User not found")
     return user
 
 
@@ -799,7 +803,10 @@ def update_plan(
     except Exception as exc:  # noqa: BLE001
         db.rollback()
         logger.exception("Failed to update plan %s", tier)
-        raise HTTPException(status_code=500, detail=f"Could not save plan: {exc}") from exc
+        raise HTTPException(
+            status_code=500,
+            detail="Could not save plan. Please try again.",
+        ) from exc
     record_audit(
         db,
         user_id=admin.id,

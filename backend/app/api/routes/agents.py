@@ -172,7 +172,19 @@ async def update_agent(
     db: Session = Depends(get_db),
 ):
     agent = _get_owned_agent(agent_id, user, db)
-    for field, value in payload.model_dump(exclude_unset=True).items():
+    data = payload.model_dump(exclude_unset=True)
+    # A generic PATCH must not "publish" an agent — publishing provisions the
+    # upstream assistant and only happens via POST /{id}/publish. Allow marking
+    # PUBLISHED only if the agent is already provisioned upstream.
+    if (
+        data.get("status") == AgentStatus.PUBLISHED
+        and not agent.vapi_assistant_id
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Use the publish action to publish an agent.",
+        )
+    for field, value in data.items():
         setattr(agent, field, value)
     db.commit()
     db.refresh(agent)

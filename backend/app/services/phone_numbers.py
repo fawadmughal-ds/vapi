@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -26,7 +27,13 @@ def build_provider_body(payload: PhoneNumberProvision) -> tuple[dict, str]:
     if payload.method == "vapi_number":
         if not payload.area_code:
             raise HTTPException(status_code=422, detail="An area code is required (US only).")
-        body.update({"provider": "vapi", "numberDesiredAreaCode": payload.area_code.strip()})
+        area_code = payload.area_code.strip()
+        if not re.fullmatch(r"\d{3}", area_code):
+            raise HTTPException(
+                status_code=422,
+                detail="Area code must be exactly 3 digits (for example, 415 or 831).",
+            )
+        body.update({"provider": "vapi", "numberDesiredAreaCode": area_code})
         return body, "vapi"
 
     if payload.method == "vapi_sip":
@@ -99,9 +106,11 @@ async def provision_phone_number(
         data = await voice_provider.create_phone_number(body)
     except VoiceProviderError as exc:
         logger.warning("Provider rejected phone number (%s): %s", payload.method, exc)
+        message = str(exc).strip()
         raise HTTPException(
             status_code=400,
-            detail=(
+            detail=message
+            or (
                 "The provider could not add this number. Check the details "
                 "(area code/number/credentials) and try again."
             ),

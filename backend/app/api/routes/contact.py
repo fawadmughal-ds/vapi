@@ -6,6 +6,7 @@ import logging
 
 from fastapi import APIRouter, HTTPException, Request
 
+from app.core.rate_limit import limiter
 from app.schemas.common import Message
 from app.schemas.contact import ContactRequest
 from app.services.email import email_service
@@ -16,6 +17,7 @@ router = APIRouter(prefix="/contact", tags=["contact"])
 
 
 @router.post("", response_model=Message)
+@limiter.limit("5/hour")
 def submit_contact(request: Request, payload: ContactRequest):
     """Deliver a contact-form submission to the support inbox.
 

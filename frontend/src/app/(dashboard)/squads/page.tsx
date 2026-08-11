@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   Dialog,
   DialogDescription,
@@ -25,6 +26,7 @@ import { cn } from "@/lib/utils";
 import type { Agent, Squad } from "@/lib/types";
 
 export default function SquadsPage() {
+  const confirm = useConfirm();
   const { data: squads, loading, reload } = useApi<Squad[]>("/squads");
   const [agents, setAgents] = useState<Agent[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -103,7 +105,15 @@ export default function SquadsPage() {
   }
 
   async function remove(s: Squad) {
-    if (!confirm(`Delete squad "${s.name}"?`)) return;
+    if (
+      !(await confirm({
+        title: "Delete squad?",
+        description: `"${s.name}" will be permanently deleted.`,
+        confirmLabel: "Delete",
+        destructive: true,
+      }))
+    )
+      return;
     setBusyId(s.id);
     try {
       await api.delete(`/squads/${s.id}`);

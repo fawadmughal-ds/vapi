@@ -27,6 +27,7 @@ export default function SettingsPage() {
   const [tab, setTab] = useState("profile");
   const [profile, setProfile] = useState({ name: "", company_name: "" });
   const [pw, setPw] = useState({ current_password: "", new_password: "" });
+  const [confirmPw, setConfirmPw] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPw, setSavingPw] = useState(false);
 
@@ -54,10 +55,23 @@ export default function SettingsPage() {
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault();
+    if (
+      pw.new_password.length < 8 ||
+      !/[A-Za-z]/.test(pw.new_password) ||
+      !/\d/.test(pw.new_password)
+    ) {
+      toast.error("New password needs 8+ characters with a letter and a number");
+      return;
+    }
+    if (pw.new_password !== confirmPw) {
+      toast.error("New passwords don't match");
+      return;
+    }
     setSavingPw(true);
     try {
       await api.post("/settings/password", pw);
       setPw({ current_password: "", new_password: "" });
+      setConfirmPw("");
       toast.success("Password updated");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Change failed");
@@ -174,6 +188,23 @@ export default function SettingsPage() {
                       }
                       required
                     />
+                    <p className="text-xs text-muted-foreground">
+                      At least 8 characters, including a letter and a number.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Confirm new password</Label>
+                    <Input
+                      type="password"
+                      value={confirmPw}
+                      onChange={(e) => setConfirmPw(e.target.value)}
+                      required
+                    />
+                    {confirmPw.length > 0 && confirmPw !== pw.new_password && (
+                      <p className="text-xs text-destructive">
+                        Passwords don&apos;t match
+                      </p>
+                    )}
                   </div>
                   <Button type="submit" disabled={savingPw}>
                     {savingPw && <Spinner />} Update password

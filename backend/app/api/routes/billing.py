@@ -51,24 +51,36 @@ def get_subscription(user: User = Depends(get_verified_user), db: Session = Depe
     )
 
 
+def _billing_owner(db: Session, user: User) -> User:
+    """Billing always belongs to the tenant owner, not an individual team member.
+
+    Keying the Stripe customer + subscription to the owner means one plan/wallet
+    per tenant, and webhooks (which resolve by customer id / client_reference_id)
+    update the owner's subscription rather than a sub-user's.
+    """
+    owner = db.get(User, tenant_id(user))
+    return owner or user
+
+
 @router.post("/checkout", response_model=CheckoutResponse)
 def create_checkout(
     payload: CheckoutRequest,
     user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
-    user.stripe_customer_id = stripe_service.ensure_customer(
-        email=user.email, name=user.name, existing_id=user.stripe_customer_id
+    owner = _billing_owner(db, user)
+    owner.stripe_customer_id = stripe_service.ensure_customer(
+        email=owner.email, name=owner.name, existing_id=owner.stripe_customer_id
     )
     db.commit()
 
     frontend = settings.FRONTEND_URL.rstrip("/")
     url = stripe_service.create_checkout_session(
-        customer_id=user.stripe_customer_id,
+        customer_id=owner.stripe_customer_id,
         plan=payload.plan,
         success_url=payload.success_url or f"{frontend}/billing?status=success",
         cancel_url=payload.cancel_url or f"{frontend}/billing?status=cancelled",
-        client_reference_id=user.id,
+        client_reference_id=owner.id,
     )
     record_audit(db, user_id=user.id, action="billing.checkout", resource_type="subscription",
                  detail={"plan": payload.plan.value})
@@ -77,12 +89,13 @@ def create_checkout(
 
 @router.post("/portal", response_model=CheckoutResponse)
 def billing_portal(user: User = Depends(get_verified_user), db: Session = Depends(get_db)):
-    user.stripe_customer_id = stripe_service.ensure_customer(
-        email=user.email, name=user.name, existing_id=user.stripe_customer_id
+    owner = _billing_owner(db, user)
+    owner.stripe_customer_id = stripe_service.ensure_customer(
+        email=owner.email, name=owner.name, existing_id=owner.stripe_customer_id
     )
     db.commit()
     frontend = settings.FRONTEND_URL.rstrip("/")
     url = stripe_service.create_billing_portal(
-        customer_id=user.stripe_customer_id, return_url=f"{frontend}/billing"
+        customer_id=owner.stripe_customer_id, return_url=f"{frontend}/billing"
     )
     return CheckoutResponse(checkout_url=url)

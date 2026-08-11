@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,10 +17,11 @@ from app.models.user import User
 from app.schemas.common import Message
 from app.schemas.knowledge_base import DocumentPublic
 from app.services.audit import record_audit
-from app.services.documents import detect_type, extract_text
+from app.services.documents import detect_type, extract_text, verify_magic_bytes
 from app.services.storage import storage_service
 from app.services.voice import voice_provider
 
+logger = logging.getLogger("voxa.knowledge_base")
 router = APIRouter(prefix="/knowledge-base", tags=["knowledge-base"])
 
 MAX_FILE_SIZE = 25 * 1024 * 1024  # 25 MB
@@ -48,6 +51,13 @@ async def upload_document(
     content = await file.read()
     if len(content) > MAX_FILE_SIZE:
         raise HTTPException(status_code=413, detail="File exceeds 25 MB limit")
+
+    # Defend against MIME/extension spoofing: the real file signature must match.
+    if not verify_magic_bytes(content, file_type):
+        raise HTTPException(
+            status_code=400,
+            detail="File contents don't match a valid PDF, DOCX, or TXT file.",
+        )
 
     if agent_id:
         agent = db.get(Agent, agent_id)
@@ -79,9 +89,11 @@ async def upload_document(
             doc.file_name, content, file.content_type or "application/octet-stream"
         )
         doc.status = DocumentStatus.READY
-    except Exception as exc:  # noqa: BLE001
+    except Exception:  # noqa: BLE001
+        logger.exception("Knowledge-base upload to provider failed for doc %s", doc.id)
         doc.status = DocumentStatus.FAILED
-        doc.error_message = str(exc)
+        # Don't surface raw upstream exception text to the client.
+        doc.error_message = "Processing failed. Please try re-uploading."
     db.commit()
     db.refresh(doc)
 

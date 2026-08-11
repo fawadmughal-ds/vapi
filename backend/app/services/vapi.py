@@ -68,8 +68,18 @@ class VapiClient:
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.request(method, url, headers=self._headers(), **kwargs)
             if resp.status_code >= 400:
-                logger.error("Vapi error %s: %s", resp.status_code, resp.text)
-                raise VapiError(f"Voice provider error ({resp.status_code})")
+                detail = resp.text
+                try:
+                    payload = resp.json()
+                    message = payload.get("message")
+                    if isinstance(message, list):
+                        detail = "; ".join(str(part) for part in message)
+                    elif isinstance(message, str):
+                        detail = message
+                except Exception:
+                    pass
+                logger.error("Vapi error %s: %s", resp.status_code, detail)
+                raise VapiError(detail or f"Voice provider error ({resp.status_code})")
             if resp.status_code == 204 or not resp.content:
                 return {}
             return resp.json()
@@ -266,6 +276,10 @@ class VapiClient:
     async def list_credentials(self) -> list[dict[str, Any]]:
         """Return connected provider credentials in the upstream org."""
         return await self._get_list("/credential")
+
+    async def list_files(self) -> list[dict[str, Any]]:
+        """Return knowledge-base files that exist in the upstream org."""
+        return await self._get_list("/file")
 
     async def create_phone_number(self, body: dict[str, Any]) -> dict[str, Any]:
         """Create/import a phone number with any supported provider payload.

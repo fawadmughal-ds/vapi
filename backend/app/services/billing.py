@@ -73,6 +73,25 @@ def activate_plan(
     return sub
 
 
+def cancel_subscription(db: Session, user_id: str) -> Subscription:
+    """Mark a subscription canceled and revoke the paid monthly allowance.
+
+    Called from the Stripe ``customer.subscription.deleted`` webhook so that a
+    downgrade/cancellation in the Stripe portal is reflected in our DB instead of
+    leaving the tenant on a paid plan forever. The persistent top-up wallet is
+    preserved.
+    """
+    sub = ensure_subscription(db, user_id)
+    sub.status = SubscriptionStatus.CANCELED
+    sub.credit_limit = 0.0
+    sub.credits_used = 0.0
+    sub.minutes_limit = 0
+    sub.minutes_used = 0
+    db.commit()
+    db.refresh(sub)
+    return sub
+
+
 def record_usage(db: Session, user_id: str, minutes: float) -> None:
     """Convert call minutes into credits and deduct from tenant + platform pool."""
     sub = ensure_subscription(db, user_id)

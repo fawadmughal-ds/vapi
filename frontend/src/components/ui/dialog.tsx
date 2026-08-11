@@ -12,15 +12,52 @@ interface DialogProps {
   className?: string;
 }
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
 export function Dialog({ open, onClose, children, className }: DialogProps) {
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const titleId = React.useId();
+
   React.useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+
+    // Remember what had focus so we can restore it on close.
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      // Trap Tab focus within the dialog.
+      if (e.key === "Tab" && panelRef.current) {
+        const nodes = panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE);
+        if (nodes.length === 0) return;
+        const first = nodes[0];
+        const last = nodes[nodes.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
     document.addEventListener("keydown", handler);
     document.body.style.overflow = "hidden";
+
+    // Move initial focus into the dialog.
+    const toFocus =
+      panelRef.current?.querySelector<HTMLElement>(FOCUSABLE) ?? panelRef.current;
+    toFocus?.focus();
+
     return () => {
       document.removeEventListener("keydown", handler);
       document.body.style.overflow = "";
+      previouslyFocused?.focus?.();
     };
   }, [open, onClose]);
 
@@ -31,15 +68,23 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
       <div
         className="absolute inset-0 bg-foreground/25 backdrop-blur-sm animate-in fade-in"
         onClick={onClose}
+        aria-hidden="true"
       />
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
         className={cn(
           "glass-panel animate-scale-in relative z-10 w-full max-w-lg p-6 shadow-[0_24px_60px_-24px_hsl(224_18%_14%/0.25)]",
           className
         )}
       >
+        {/* Screen-reader label fallback; a visible <DialogTitle> also sets this id. */}
+        <span id={titleId} className="sr-only">
+          Dialog
+        </span>
         <button
           onClick={onClose}
           aria-label="Close"

@@ -1,7 +1,5 @@
 """Authentication routes: register, login, refresh, verify, password reset."""
 
-from __future__ import annotations
-
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -10,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.deps import get_current_user
+from app.core.rate_limit import limiter
 from app.core.security import (
     REFRESH_TOKEN_TYPE,
     create_access_token,
@@ -22,7 +21,7 @@ from app.core.security import (
     verify_otp,
     verify_password,
 )
-from app.models.enums import UserRole
+from app.models.enums import AccountStatus, UserRole
 from app.models.token import EmailToken
 from app.models.user import User
 from app.schemas.auth import (
@@ -94,6 +93,7 @@ def _create_verification_otp(db: Session, user: User) -> str:
 
 
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("10/hour")
 def register(request: Request, payload: RegisterRequest, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == payload.email.lower()).first()
     if existing:
@@ -122,6 +122,7 @@ def register(request: Request, payload: RegisterRequest, db: Session = Depends(g
 
 
 @router.post("/login", response_model=AuthResponse)
+@limiter.limit("10/minute")
 def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email.lower()).first()
     if not user or not verify_password(payload.password, user.password_hash):
@@ -134,13 +135,17 @@ def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)
 
 
 @router.post("/refresh", response_model=TokenPair)
-def refresh(payload: RefreshRequest, db: Session = Depends(get_db)):
+@limiter.limit("30/minute")
+def refresh(request: Request, payload: RefreshRequest, db: Session = Depends(get_db)):
     data = decode_token(payload.refresh_token)
     if not data or data.get("type") != REFRESH_TOKEN_TYPE:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
     user = db.get(User, data.get("sub"))
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
+    # A suspended account must not be able to mint fresh access tokens.
+    if user.status == AccountStatus.SUSPENDED:
+        raise HTTPException(status_code=403, detail="Account suspended")
     return _issue_tokens(user)
 
 
@@ -168,7 +173,8 @@ def verify_email(payload: VerifyEmailRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/verify-otp", response_model=Message)
-def verify_otp_code(payload: VerifyOtpRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def verify_otp_code(request: Request, payload: VerifyOtpRequest, db: Session = Depends(get_db)):
     """Verify a new user's email using the 6-digit code sent on registration."""
     user = db.query(User).filter(User.email == payload.email.lower()).first()
     if not user:
@@ -204,7 +210,8 @@ def verify_otp_code(payload: VerifyOtpRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/resend-otp", response_model=Message)
-def resend_otp(payload: ResendOtpRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/hour")
+def resend_otp(request: Request, payload: ResendOtpRequest, db: Session = Depends(get_db)):
     """Re-send a verification code. Generic response to avoid user enumeration."""
     user = db.query(User).filter(User.email == payload.email.lower()).first()
     if user and not user.is_email_verified:
@@ -224,7 +231,8 @@ def resend_verification(user: User = Depends(get_current_user),
 
 
 @router.post("/forgot-password", response_model=Message)
-def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/hour")
+def forgot_password(request: Request, payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email.lower()).first()
     # Always return success to avoid user enumeration.
     if user:
@@ -235,7 +243,8 @@ def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db
 
 
 @router.post("/reset-password", response_model=Message)
-def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/hour")
+def reset_password(request: Request, payload: ResetPasswordRequest, db: Session = Depends(get_db)):
     token = (
         db.query(EmailToken)
         .filter(EmailToken.token == payload.token, EmailToken.purpose == "reset")

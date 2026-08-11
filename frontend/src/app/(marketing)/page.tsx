@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { PricingCards } from "@/components/marketing/pricing-cards";
+import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { Button } from "@/components/ui/button";
 import { useMarketing } from "@/lib/marketing/store";
 
@@ -32,12 +33,20 @@ export default function HomePage() {
   const { store } = useMarketing();
   const { hero, testimonials } = store.content;
 
+  // Render the last two words of the headline with the gradient treatment.
+  const headlineWords = hero.headline.trim().split(/\s+/);
+  const gradientFrom = Math.max(headlineWords.length - 2, 0);
+  const headlinePlain = headlineWords.slice(0, gradientFrom).join(" ");
+  const headlineGradient = headlineWords.slice(gradientFrom).join(" ");
+
   return (
     <>
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border/40">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.06),transparent_60%)]" />
-        <div className="absolute -right-24 top-0 size-[32rem] rounded-full bg-primary/[0.05] blur-[120px] animate-aurora" />
+        <div className="hero-grid-bg absolute inset-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.10),transparent_60%)]" />
+        <div className="absolute -right-24 top-0 size-[32rem] rounded-full bg-primary/[0.09] blur-[120px] animate-aurora" />
+        <div className="absolute -left-32 top-40 size-[26rem] rounded-full bg-[hsl(var(--glow-cyan)/0.06)] blur-[110px] animate-aurora [animation-delay:-7s]" />
         <div className="relative mx-auto max-w-7xl px-4 py-24 lg:px-8 lg:py-32">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="animate-slide-up">
@@ -46,7 +55,10 @@ export default function HomePage() {
                 {hero.badge}
               </div>
               <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.7rem]">
-                {hero.headline}
+                {headlinePlain}{" "}
+                <span className="text-gradient animate-gradient-pan">
+                  {headlineGradient}
+                </span>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
                 {hero.subheadline}
@@ -77,7 +89,8 @@ export default function HomePage() {
 
             {/* Product mockup */}
             <div className="relative hidden lg:block">
-              <div className="glass-panel overflow-hidden animate-float">
+              <div className="absolute left-1/2 top-1/2 -z-10 size-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_180deg,hsl(var(--glow-cyan)/0.16),hsl(var(--primary)/0.2),hsl(288_85%_62%/0.14),hsl(var(--glow-cyan)/0.16))] blur-[70px]" />
+              <div className="glass-panel overflow-hidden animate-float border-primary/20">
                 <div className="flex items-center gap-2 border-b border-border/50 bg-muted/30 px-4 py-3">
                   <div className="size-2.5 rounded-full bg-red-400/80" />
                   <div className="size-2.5 rounded-full bg-amber-400/80" />
@@ -116,14 +129,16 @@ export default function HomePage() {
                       </span>
                     </div>
                   ))}
-                  {/* Waveform visual */}
-                  <div className="flex h-12 items-end justify-center gap-1 rounded-xl border border-primary/15 bg-primary/[0.07] px-4 py-2">
+                  {/* Waveform visual — live equalizer */}
+                  <div className="flex h-12 items-center justify-center gap-1 rounded-xl border border-primary/15 bg-primary/[0.07] px-4 py-2">
                     {Array.from({ length: 32 }).map((_, i) => (
                       <div
                         key={i}
-                        className="w-1 rounded-full bg-gradient-to-t from-primary/55 to-primary"
+                        className="wave-bar w-1"
                         style={{
-                          height: `${18 + Math.abs(Math.sin(i * 0.55)) * 22}px`,
+                          height: `${Math.round(16 + Math.abs(Math.sin(i * 0.55)) * 22)}px`,
+                          animationDelay: `${((i % 8) * 0.11).toFixed(2)}s`,
+                          animationDuration: `${(0.9 + (i % 5) * 0.12).toFixed(2)}s`,
                         }}
                       />
                     ))}
@@ -141,7 +156,7 @@ export default function HomePage() {
           {METRICS.map((m) => (
             <div key={m.label} className="text-center">
               <p className="font-mono text-2xl font-semibold tracking-tight text-gradient">
-                {m.value}
+                <AnimatedCounter value={m.value} duration={1400} />
               </p>
               <p className="mt-1 text-sm text-muted-foreground">{m.label}</p>
             </div>
@@ -277,7 +292,8 @@ export default function HomePage() {
 
       {/* Final CTA */}
       <section className="py-24">
-        <div className="glass-panel mx-auto max-w-4xl px-6 py-14 text-center lg:px-12">
+        <div className="aurora-border glass-panel relative mx-auto max-w-4xl px-6 py-14 text-center lg:px-12">
+          <div className="pointer-events-none absolute -top-24 left-1/2 size-[22rem] -translate-x-1/2 rounded-full bg-primary/[0.10] blur-[90px]" />
           <p className="telemetry-label mb-4">Ready when you are</p>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             Ready to deploy AI voice agents?

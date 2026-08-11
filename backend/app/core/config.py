@@ -108,9 +108,11 @@ class Settings(BaseSettings):
         if not self.is_production:
             return self
         key = self.SECRET_KEY.strip()
-        if key.lower() in _INSECURE_SECRET_KEYS:
+        if key.lower() in _INSECURE_SECRET_KEYS or len(key) < 32:
             raise ValueError(
-                "SECRET_KEY must be set to a secure random value when ENVIRONMENT=production"
+                "SECRET_KEY must be a secure random value of at least 32 characters "
+                "when ENVIRONMENT=production (generate with "
+                "`python -c 'import secrets; print(secrets.token_urlsafe(64))'`)"
             )
         if self.SUPERADMIN_PASSWORD == _INSECURE_SUPERADMIN_PASSWORD:
             raise ValueError(

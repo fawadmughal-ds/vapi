@@ -71,21 +71,16 @@ class StripeService:
         return session.url
 
     def verify_webhook(self, payload: bytes, signature: str):
-        secret = settings.STRIPE_WEBHOOK_SECRET
-        if settings.is_production:
-            if not secret:
-                logger.error("STRIPE_WEBHOOK_SECRET is not configured in production")
-                raise WebhookNotConfiguredError("Stripe webhook secret not configured")
-            if not signature:
-                raise WebhookVerificationError("Missing Stripe-Signature header")
-            return stripe.Webhook.construct_event(payload, signature, secret)
-        if not secret:
-            logger.warning(
-                "STRIPE_WEBHOOK_SECRET is not set — parsing unsigned webhooks (dev only)"
-            )
-            import json
+        """Verify a Stripe webhook signature.
 
-            return json.loads(payload)
+        Fail-closed in ALL environments: an unsigned/unconfigured webhook is
+        never trusted, because accepting one lets anyone forge
+        ``checkout.session.completed`` and provision a paid plan for free.
+        """
+        secret = settings.STRIPE_WEBHOOK_SECRET
+        if not secret:
+            logger.error("STRIPE_WEBHOOK_SECRET is not configured — rejecting webhook")
+            raise WebhookNotConfiguredError("Stripe webhook secret not configured")
         if not signature:
             raise WebhookVerificationError("Missing Stripe-Signature header")
         return stripe.Webhook.construct_event(payload, signature, secret)

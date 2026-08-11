@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -30,6 +31,7 @@ function formatSize(bytes: number): string {
 }
 
 export default function KnowledgeBasePage() {
+  const confirm = useConfirm();
   const { data: docs, loading, reload } = useApi<KnowledgeDoc[]>(
     "/knowledge-base"
   );
@@ -55,7 +57,15 @@ export default function KnowledgeBasePage() {
   }
 
   async function remove(docId: string) {
-    if (!confirm("Delete this document?")) return;
+    if (
+      !(await confirm({
+        title: "Delete document?",
+        description: "This document will be removed from the knowledge base.",
+        confirmLabel: "Delete",
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await api.delete(`/knowledge-base/${docId}`);
       toast.success("Document deleted");
