@@ -80,6 +80,17 @@ export function useWebCall(agentId: string) {
   }, [stop]);
 
   const start = useCallback(async () => {
+    // Tear down any previous instance first — Daily/Vapi warn (and can eject
+    // the meeting) if multiple call instances exist simultaneously.
+    if (vapiRef.current) {
+      try {
+        vapiRef.current.stop();
+        vapiRef.current.removeAllListeners?.();
+      } catch {
+        /* ignore */
+      }
+      vapiRef.current = null;
+    }
     setError(null);
     setTranscript([]);
     setStatus("connecting");

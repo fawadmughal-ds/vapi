@@ -25,8 +25,13 @@ const DAILY_WS = "wss://*.daily.co";
 // source maps, and — more importantly — Daily's call-machine bundle (loaded by
 // the Vapi web SDK) evaluates strings as JavaScript at runtime, so in-browser
 // calling breaks entirely without it. This is an accepted trade-off for WebRTC.
+// `blob:` is required because Daily loads its Krisp noise-cancellation
+// AudioWorklet from a blob: URL. Worklet modules are validated against
+// script-src (script-src-elem falls back to it), not worker-src, so without
+// blob: here the mic processor fails with WORKLET_NOT_SUPPORTED and the call
+// is ejected for "did not receive customer audio".
 const scriptSrc = [
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:",
   "https://www.googletagmanager.com https://www.google-analytics.com",
   DAILY,
 ]
