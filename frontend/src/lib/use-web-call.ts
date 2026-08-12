@@ -63,9 +63,20 @@ export function useWebCall(agentId: string) {
       vapi.on("speech-start", () => setAssistantSpeaking(true));
       vapi.on("speech-end", () => setAssistantSpeaking(false));
       vapi.on("error", (e?: unknown) => {
+        const err = e as {
+          message?: string;
+          errorMsg?: string;
+          error?: { message?: string; msg?: string };
+          msg?: string;
+        };
         const msg =
-          (e as { message?: string })?.message ||
-          (typeof e === "string" ? e : "Call error");
+          err?.message ||
+          err?.errorMsg ||
+          err?.error?.message ||
+          err?.error?.msg ||
+          err?.msg ||
+          (typeof e === "string" ? e : "") ||
+          "Call could not connect. Check your microphone permission and try again.";
         setError(msg);
         setStatus("error");
       });

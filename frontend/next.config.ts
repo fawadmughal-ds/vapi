@@ -14,10 +14,18 @@ const BACKEND_INTERNAL_URL =
 // dev tooling that require 'unsafe-eval'. Production builds never use eval, so
 // we only relax the policy outside production.
 const isDev = process.env.NODE_ENV !== "production";
+
+// Vapi's in-browser web SDK (@vapi-ai/web) runs WebRTC through Daily.co, which
+// loads a call bundle/worker from *.daily.co and opens websockets to it. These
+// hosts must be whitelisted or the browser "Talk to your agent" call fails.
+const DAILY = "https://*.daily.co";
+const DAILY_WS = "wss://*.daily.co";
+
 const scriptSrc = [
   "script-src 'self' 'unsafe-inline'",
   isDev ? "'unsafe-eval'" : "",
   "https://www.googletagmanager.com https://www.google-analytics.com",
+  DAILY,
 ]
   .filter(Boolean)
   .join(" ");
@@ -38,11 +46,11 @@ function apiOrigin(): string {
 const connectSrc = isDev
   ? // Dev is local-only: allow localhost API/HMR websockets so hot reload and a
     // cross-port backend both work without fighting CSP.
-    "connect-src 'self' http://localhost:* ws://localhost:* https://api.vapi.ai wss://*.vapi.ai https://*.vapi.ai https://www.google-analytics.com"
+    `connect-src 'self' http://localhost:* ws://localhost:* https://api.vapi.ai wss://*.vapi.ai https://*.vapi.ai ${DAILY} ${DAILY_WS} https://www.google-analytics.com`
   : [
       "connect-src 'self'",
       apiOrigin(),
-      "https://api.vapi.ai wss://*.vapi.ai https://*.vapi.ai https://www.google-analytics.com",
+      `https://api.vapi.ai wss://*.vapi.ai https://*.vapi.ai ${DAILY} ${DAILY_WS} https://www.google-analytics.com`,
     ]
       .filter(Boolean)
       .join(" ");
@@ -54,9 +62,15 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https:",
   "font-src 'self' data:",
-  // XHR/fetch/websocket: API origin + Vapi + analytics.
+  // XHR/fetch/websocket: API origin + Vapi + Daily (WebRTC) + analytics.
   connectSrc,
-  "media-src 'self' blob: https://*.vapi.ai",
+  // Recordings can be served from Vapi storage or an arbitrary CDN/S3 host, and
+  // the web call streams remote audio from Daily — allow any https media + blob.
+  `media-src 'self' blob: https: ${DAILY}`,
+  // Daily spawns web workers (blob:) and may mount a call frame from *.daily.co.
+  "worker-src 'self' blob:",
+  "child-src 'self' blob: https://*.daily.co",
+  "frame-src 'self' https://*.daily.co",
   "frame-ancestors 'self'",
   "base-uri 'self'",
   "form-action 'self'",
