@@ -21,9 +21,12 @@ const isDev = process.env.NODE_ENV !== "production";
 const DAILY = "https://*.daily.co";
 const DAILY_WS = "wss://*.daily.co";
 
+// 'unsafe-eval' is required in BOTH dev and prod: Next.js dev uses eval-based
+// source maps, and — more importantly — Daily's call-machine bundle (loaded by
+// the Vapi web SDK) evaluates strings as JavaScript at runtime, so in-browser
+// calling breaks entirely without it. This is an accepted trade-off for WebRTC.
 const scriptSrc = [
-  "script-src 'self' 'unsafe-inline'",
-  isDev ? "'unsafe-eval'" : "",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "https://www.googletagmanager.com https://www.google-analytics.com",
   DAILY,
 ]
@@ -67,8 +70,9 @@ const csp = [
   // Recordings can be served from Vapi storage or an arbitrary CDN/S3 host, and
   // the web call streams remote audio from Daily — allow any https media + blob.
   `media-src 'self' blob: https: ${DAILY}`,
-  // Daily spawns web workers (blob:) and may mount a call frame from *.daily.co.
-  "worker-src 'self' blob:",
+  // Daily spawns web workers + Krisp audio worklets (blob: / *.daily.co) and
+  // may mount a call frame from *.daily.co.
+  "worker-src 'self' blob: https://*.daily.co",
   "child-src 'self' blob: https://*.daily.co",
   "frame-src 'self' https://*.daily.co",
   "frame-ancestors 'self'",

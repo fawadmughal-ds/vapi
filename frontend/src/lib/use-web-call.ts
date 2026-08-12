@@ -21,6 +21,40 @@ type VapiInstance = {
   removeAllListeners?: () => void;
 };
 
+/**
+ * Vapi/Daily emit errors in several shapes (strings, `{ message }`,
+ * `{ type, msg, details }`, nested `{ error: {...} }`). Always resolve to a
+ * human-readable string so we never try to render an object as a React child.
+ */
+function extractErrorMessage(e: unknown): string {
+  if (!e) return "Call could not connect. Please try again.";
+  if (typeof e === "string") return e;
+  if (e instanceof Error) return e.message;
+
+  const obj = e as Record<string, unknown>;
+  const candidates = [
+    obj.message,
+    obj.errorMsg,
+    obj.msg,
+    (obj.error as { message?: string } | undefined)?.message,
+    (obj.error as { msg?: string } | undefined)?.msg,
+  ];
+  const raw = candidates.find((c) => typeof c === "string") as string | undefined;
+
+  // Vapi ejects the meeting when the assistant fails to start (bad/missing
+  // provider credential, invalid assistant config, or account limits).
+  if (raw && /ejection|meeting has ended|ejected/i.test(raw)) {
+    return "The agent couldn't start the call. This usually means a voice/model provider isn't connected for this agent, or the assistant needs to be re-published. Check Integrations and try again.";
+  }
+  if (raw) return raw;
+
+  try {
+    return JSON.stringify(e);
+  } catch {
+    return "Call could not connect. Please try again.";
+  }
+}
+
 export function useWebCall(agentId: string) {
   const [status, setStatus] = useState<WebCallStatus>("idle");
   const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
@@ -63,21 +97,7 @@ export function useWebCall(agentId: string) {
       vapi.on("speech-start", () => setAssistantSpeaking(true));
       vapi.on("speech-end", () => setAssistantSpeaking(false));
       vapi.on("error", (e?: unknown) => {
-        const err = e as {
-          message?: string;
-          errorMsg?: string;
-          error?: { message?: string; msg?: string };
-          msg?: string;
-        };
-        const msg =
-          err?.message ||
-          err?.errorMsg ||
-          err?.error?.message ||
-          err?.error?.msg ||
-          err?.msg ||
-          (typeof e === "string" ? e : "") ||
-          "Call could not connect. Check your microphone permission and try again.";
-        setError(msg);
+        setError(extractErrorMessage(e));
         setStatus("error");
       });
       vapi.on("message", (msg?: unknown) => {
