@@ -42,6 +42,13 @@ def platform_has_capacity(db: Session) -> bool:
     settings_row = get_platform_settings(db)
     if not settings_row.enforce_pool:
         return True
+    # Pool not configured yet (nothing purchased) → don't hard-block calls. The
+    # hard cap is meant to prevent overselling a *funded* pool; a brand-new
+    # platform with 0 purchased credits would otherwise block every outbound
+    # call, so we defer enforcement until an admin actually records a pool and
+    # rely on the provider's own wallet balance until then.
+    if settings_row.credits_purchased <= 0:
+        return True
     return settings_row.credits_remaining > 0
 
 
