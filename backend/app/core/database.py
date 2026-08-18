@@ -1,22 +1,31 @@
 """Database engine, session factory, and declarative base."""
 
+from __future__ import annotations
+
 import logging
+import os
 from collections.abc import Generator
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
 
 logger = logging.getLogger("voxa.db")
 
-engine = create_engine(
-    settings.DATABASE_URL,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-    future=True,
-)
+# Serverless hosts (Vercel, Lambda) must not keep a connection pool — each
+# invocation opens/closes its own connection via NullPool.
+_is_serverless = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+
+_engine_kwargs: dict = {"pool_pre_ping": True, "future": True}
+if _is_serverless:
+    _engine_kwargs["poolclass"] = NullPool
+else:
+    _engine_kwargs["pool_size"] = 10
+    _engine_kwargs["max_overflow"] = 20
+
+engine = create_engine(settings.DATABASE_URL, **_engine_kwargs)
 
 SessionLocal = sessionmaker(
     bind=engine, autocommit=False, autoflush=False, expire_on_commit=False

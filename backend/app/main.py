@@ -28,9 +28,14 @@ async def lifespan(app: FastAPI):
     # Import models so metadata is populated, then create tables.
     import app.models  # noqa: F401
 
-    Base.metadata.create_all(bind=engine)
-    ensure_runtime_schema()
-    logger.info("%s API ready (%s)", settings.PROJECT_NAME, settings.ENVIRONMENT)
+    try:
+        Base.metadata.create_all(bind=engine)
+        ensure_runtime_schema()
+        logger.info("%s API ready (%s)", settings.PROJECT_NAME, settings.ENVIRONMENT)
+    except Exception:
+        # Don't crash the whole function on cold start — log and serve /health
+        # so deploy issues are visible in logs instead of a blank 500.
+        logger.exception("Database init failed at startup")
     yield
 
 
