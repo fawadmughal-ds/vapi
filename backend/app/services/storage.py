@@ -8,17 +8,28 @@ from pathlib import Path
 
 from app.core.config import settings
 
+_is_serverless = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+
 
 class StorageService:
     def __init__(self) -> None:
-        self.base_dir = Path(settings.STORAGE_LOCAL_DIR)
-        self.base_dir.mkdir(parents=True, exist_ok=True)
+        # Vercel/Lambda only allow writes under /tmp — creating ./storage at import
+        # time on a read-only filesystem crashes the whole function on cold start.
+        if _is_serverless:
+            self.base_dir = Path("/tmp/storage")
+        else:
+            self.base_dir = Path(settings.STORAGE_LOCAL_DIR)
+
+    def _ensure_dir(self, path: Path | None = None) -> None:
+        target = path or self.base_dir
+        target.mkdir(parents=True, exist_ok=True)
 
     def save(self, *, user_id: str, file_name: str, content: bytes) -> tuple[str, int]:
         """Persist a file and return (relative_path, size_bytes)."""
+        self._ensure_dir()
         safe_name = f"{uuid.uuid4().hex}_{os.path.basename(file_name)}"
         user_dir = self.base_dir / user_id
-        user_dir.mkdir(parents=True, exist_ok=True)
+        self._ensure_dir(user_dir)
         full_path = user_dir / safe_name
         full_path.write_bytes(content)
         rel = str(full_path.relative_to(self.base_dir))
