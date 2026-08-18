@@ -31,6 +31,9 @@ async def lifespan(app: FastAPI):
     try:
         Base.metadata.create_all(bind=engine)
         ensure_runtime_schema()
+        from app.seed import create_super_admin
+
+        create_super_admin()
         logger.info("%s API ready (%s)", settings.PROJECT_NAME, settings.ENVIRONMENT)
     except Exception:
         # Don't crash the whole function on cold start — log and serve /health

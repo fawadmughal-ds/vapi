@@ -9,7 +9,7 @@ import logging
 
 from app.core.config import settings
 from app.core.database import Base, SessionLocal, engine
-from app.core.security import hash_password
+from app.core.security import hash_password, verify_password
 from app.models.enums import UserRole
 from app.models.user import User
 
@@ -29,7 +29,15 @@ def create_super_admin() -> None:
     try:
         existing = db.query(User).filter(User.email == settings.SUPERADMIN_EMAIL.lower()).first()
         if existing:
-            logger.info("Super admin already exists: %s", existing.email)
+            # Keep the bootstrap account in sync with SUPERADMIN_PASSWORD in env
+            # (seed skips creation for existing rows, so password changes in .env
+            # would otherwise leave login broken until a manual DB update).
+            if not verify_password(settings.SUPERADMIN_PASSWORD, existing.password_hash):
+                existing.password_hash = hash_password(settings.SUPERADMIN_PASSWORD)
+                db.commit()
+                logger.info("Super admin password synced from env: %s", existing.email)
+            else:
+                logger.info("Super admin already exists: %s", existing.email)
             return
         admin = User(
             name=settings.SUPERADMIN_NAME,
